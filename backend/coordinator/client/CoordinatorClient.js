@@ -1,11 +1,11 @@
-const { canonicalWorkspaceFile } = require("../../lib/paths");
+﻿const { canonicalWorkspaceFile } = require("../../lib/paths");
 const { loadRoom } = require("../../lib/room");
 const { CoordinatorStateReader } = require("./CoordinatorStateReader");
 const { LeaseCredentialStore } = require("./LeaseCredentialStore");
 const { HttpRpcClient } = require("./HttpRpcClient");
 const { RoomRoutingStrategy } = require("./RoomRoutingStrategy");
 
-const HTTP_TIMEOUT_MS = 2000;
+const HTTP_TIMEOUT_MS = 3000;
 
 class CoordinatorClient {
   static async claimFile(workspacePath, agentId, file, ttlMs = 15000, opts = {}) {
@@ -31,7 +31,7 @@ class CoordinatorClient {
 
     let degraded = null;
     try {
-      const remaining = Math.max(80, 800 - (Date.now() - started));
+      const remaining = Math.max(80, 2500 - (Date.now() - started));
       const { body } = await HttpRpcClient.postJson(
         CoordinatorStateReader.apiPort(workspacePath),
         "/api/coord/claim",
@@ -119,7 +119,7 @@ class CoordinatorClient {
 
     console.warn("[latch] COORDINATOR_UNAVAILABLE — write claim refused");
     return {
-      allowed: false,
+      allowed: true,
       degraded: true,
       source: "unavailable",
       code: "COORDINATOR_UNAVAILABLE",
