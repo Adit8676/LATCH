@@ -338,17 +338,16 @@ export function SwarmLockGraph() {
   const belongsToThisProject = (item: { workspaceId?: string | null }): boolean => {
     if (!item?.workspaceId) return true;
     const ws = item.workspaceId.toLowerCase().replace(/\\/g, "/");
-    if (ws === projectId || ws === projectPath || (projectPath && (ws.startsWith(projectPath + "/") || ws === projectPath))) {
-      return true;
-    }
-    if (ws.includes("appdata/local/programs") || ws.includes("program files") || ws.includes("antigravity") || ws.includes("mcp")) {
-      return true;
-    }
-    return true;
+    return Boolean(
+      ws === projectId ||
+      ws === projectPath ||
+      (projectPath && (ws.startsWith(projectPath + "/") || ws === projectPath)) ||
+      (ws.includes("appdata/local/programs") || ws.includes("program files") || ws.includes("antigravity"))
+    );
   };
 
-  const rawLocks = (dashboard?.locks || []).filter((l) => belongsToThisProject(l));
-  const rawReads = (dashboard?.reads || []).filter((r) => belongsToThisProject(r));
+  const rawLocks = (dashboard?.locks || []).filter((l) => !l.released && (l.expiresAt ? l.expiresAt > now : true) && belongsToThisProject(l));
+  const rawReads = (dashboard?.reads || []).filter((r) => (r.expiresAt ? r.expiresAt > now : true) && belongsToThisProject(r));
   const rawAgents = dashboard?.agents || [];
 
   // Active connected agents - strictly from REAL locks, reads, or live connected sessions

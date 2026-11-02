@@ -172,14 +172,27 @@ export function AstDependencyGraph() {
       .catch(() => undefined);
   }, [selectedProjectId, dashboard?.project.id, graphData?.nodes?.length]);
 
-  // Track active file locks from dashboard
+  // Track active file locks from dashboard strictly for this project
+  const projectPath = (dashboard?.project?.path || "").toLowerCase().replace(/\\/g, "/");
+  const projectId = dashboard?.project?.id || "";
+  const belongsToThisProject = (item: { workspaceId?: string | null }): boolean => {
+    if (!item?.workspaceId) return true;
+    const ws = item.workspaceId.toLowerCase().replace(/\\/g, "/");
+    return Boolean(
+      ws === projectId ||
+      ws === projectPath ||
+      (projectPath && (ws.startsWith(projectPath + "/") || ws === projectPath)) ||
+      (ws.includes("appdata/local/programs") || ws.includes("program files") || ws.includes("antigravity"))
+    );
+  };
+
   useEffect(() => {
     if (!dashboard?.locks) return;
     const lockedFiles = dashboard.locks
-      .filter((l) => !l.released)
+      .filter((l) => !l.released && belongsToThisProject(l))
       .map((l) => (l.filePath.includes("::") ? l.filePath.split("::")[1] : l.filePath));
     setActiveLocks(lockedFiles);
-  }, [dashboard?.locks]);
+  }, [dashboard?.locks, dashboard?.project]);
 
   const { nodes, edges, blastRadiusCount, cycleCount, lockDepth } = useMemo(() => {
     if (!graphData?.nodes?.length) {
