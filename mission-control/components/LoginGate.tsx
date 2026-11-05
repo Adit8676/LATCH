@@ -13,6 +13,7 @@ import {
   Layers,
   Radio,
 } from "lucide-react";
+import { RadialLight } from "./RadialLight";
 
 function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -69,12 +70,9 @@ export function LoginGate() {
   ];
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#111111] text-[#eeeeee] p-4 sm:p-6 selection:bg-[#ffe0c2] selection:text-[#111111]">
-      {/* Background Cybernetic Glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-[#ffe0c2]/5 blur-[120px] rounded-full" />
-        <div className="absolute -bottom-[20%] right-[10%] w-[500px] h-[350px] bg-emerald-500/5 blur-[140px] rounded-full" />
-      </div>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#111111] text-[#eeeeee] p-4 sm:p-6 selection:bg-[#ffe0c2] selection:text-[#111111] relative overflow-hidden">
+      {/* Signature Ambient Green Radial Light Glow */}
+      <RadialLight color="green" />
 
       <div className="relative z-10 w-full max-w-xl space-y-6">
         {/* Brand Header */}

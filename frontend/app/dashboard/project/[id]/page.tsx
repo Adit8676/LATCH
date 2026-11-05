@@ -36,6 +36,7 @@ import { api, ApiError } from "@/lib/api";
 import { MissionControlCast } from "@/components/MissionControlCast";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ThinkingOrb } from "thinking-orbs";
+import { HeroRadialLight } from "@/components/landing/HeroRadialLight";
 
 interface LiveLock {
   id: string;
@@ -437,7 +438,9 @@ function ProjectDashboardContent() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground font-[var(--font-body)] antialiased transition-colors duration-200">
+    <div className="min-h-screen flex bg-background text-foreground font-[var(--font-body)] antialiased transition-colors duration-200 relative overflow-hidden">
+      {/* Signature Ambient Green Radial Light Glow */}
+      <HeroRadialLight colorMode="green" position="center" topClass="top-[180px] sm:top-[220px] md:top-[260px]" />
       {/* 1. STATIC LEFT NAVIGATION SIDEBAR */}
       <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col justify-between py-3 shrink-0 z-40 select-none sticky top-0 h-screen overflow-y-auto">
         <div className="flex flex-col gap-3 w-full">
@@ -566,7 +569,7 @@ function ProjectDashboardContent() {
       </aside>
 
       {/* 2. MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col min-w-0 bg-background">
+      <div className="flex-1 flex flex-col min-w-0 bg-transparent relative z-10">
         {/* Top Breadcrumb & Live Status Bar */}
         <header className="h-14 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 sticky top-0 z-30 transition-colors duration-200">
           <div className="flex items-center gap-3">

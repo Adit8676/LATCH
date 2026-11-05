@@ -8,6 +8,7 @@ import { ProjectDashboard } from "./ProjectDashboard";
 import { RightRail } from "./RightRail";
 import { AddWorkspaceWindow } from "./AddWorkspaceWindow";
 import { NoticeToasts } from "./NoticeCenter";
+import { RadialLight } from "./RadialLight";
 import { PanesProvider, usePanes } from "@/lib/panes";
 import ui from "@/styles/ui.module.css";
 
@@ -51,6 +52,7 @@ function ShellInner() {
       className={`${ui.app} bg-background text-foreground ${leftOpen ? "" : ui.paneLeftClosed} ${rightOpen ? "" : ui.paneRightClosed} ${dragging ? ui.paneDragging : ""}`}
       style={style}
     >
+      <RadialLight color="green" />
       <TopNavbar />
       <WorkspaceDrawer />
       <Sidebar />
