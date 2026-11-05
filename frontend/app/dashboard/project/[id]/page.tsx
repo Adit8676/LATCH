@@ -443,25 +443,18 @@ function ProjectDashboardContent() {
         <div className="flex flex-col gap-3 w-full">
           {/* Top Brand Header */}
           <div className="flex items-center justify-between px-3 pb-2 border-b border-sidebar-border">
-            <Link href="/" className="flex items-center gap-2.5 group min-w-0" title="Latch Systems">
-              <div className="w-8 h-8 rounded-md overflow-hidden flex items-center justify-center border border-sidebar-border bg-card shadow-sm group-hover:border-primary/50 transition-colors p-0.5 shrink-0">
-                <Image
-                  src="/latch-logo.png"
-                  alt="Latch Systems"
-                  width={32}
-                  height={32}
-                  className="w-full h-full object-contain"
-                  priority
-                />
-              </div>
-              <div className="min-w-0">
-                <span className="font-[var(--font-display)] font-bold text-sm tracking-tight text-foreground block truncate">
-                  Latch
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground block truncate">
-                  Mission Control
-                </span>
-              </div>
+            <Link href="/" className="flex items-center gap-2 group min-w-0" title="Latch Mission Control">
+              <Image
+                src="/latch-logo.png"
+                alt="Latch"
+                width={105}
+                height={26}
+                className="h-6.5 w-auto object-contain dark:invert shrink-0 group-hover:opacity-85 transition-opacity"
+                priority
+              />
+              <span className="text-[10px] font-mono text-muted-foreground block truncate border-l border-sidebar-border pl-2">
+                MC
+              </span>
             </Link>
           </div>
 
@@ -482,7 +475,7 @@ function ProjectDashboardContent() {
                   </span>
                 ) : (
                   <span className="text-primary font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                     Online
                   </span>
                 )}
@@ -547,7 +540,7 @@ function ProjectDashboardContent() {
               <span
                 className={`w-2 h-2 rounded-full ${
                   isRunning
-                    ? "bg-primary animate-pulse"
+                    ? "bg-primary"
                     : isDeploying
                     ? "bg-amber-500 animate-spin"
                     : "bg-destructive"
@@ -594,7 +587,7 @@ function ProjectDashboardContent() {
 
             {/* Real-time Synced Live Pill */}
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-xs font-mono text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
               <span>Synced Live</span>
             </div>
           </div>
@@ -668,7 +661,7 @@ function ProjectDashboardContent() {
                   </div>
                 </div>
                 <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <Activity className="w-5 h-5 animate-pulse" />
+                  <Activity className="w-5 h-5" />
                 </div>
               </div>
 
@@ -735,7 +728,7 @@ function ProjectDashboardContent() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-mono">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
                   <span className="text-emerald-400 font-semibold">Active Stream</span>
                 </div>
               </div>
@@ -758,7 +751,7 @@ function ProjectDashboardContent() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-mono">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
                   <span className="text-emerald-400 font-semibold">Tunnel Ready</span>
                 </div>
               </div>
@@ -795,7 +788,7 @@ function ProjectDashboardContent() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2 text-xs font-mono">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
                       <span className="text-emerald-400 font-semibold">Sub-ms Mutex Bus Active</span>
                     </div>
                   </div>
@@ -834,7 +827,7 @@ function ProjectDashboardContent() {
                       <div className="flex items-center justify-between text-muted-foreground">
                         <span>Heartbeat:</span>
                         <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                           14 ms
                         </span>
                       </div>
@@ -856,7 +849,7 @@ function ProjectDashboardContent() {
                         <BookOpen className="w-4 h-4 text-primary" />
                         <span>.latch/ Memory Digest</span>
                       </h4>
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
                     </div>
 
                     <div className="space-y-2">
@@ -1245,7 +1238,7 @@ function ProjectDashboardContent() {
                   <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        isRunning ? "bg-primary animate-ping" : "bg-amber-500 animate-pulse"
+                        isRunning ? "bg-primary" : "bg-amber-500"
                       }`}
                     />
                     <span>{project.render_url ? "Render Stream" : "Listening :3001"}</span>

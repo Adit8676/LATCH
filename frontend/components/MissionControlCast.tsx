@@ -142,7 +142,7 @@ export function MissionControlCast({ tab, project, className }: MissionControlCa
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-primary/10 border border-primary/20 text-primary">
             {tab === "ast-graph" ? (
-              <Network className="w-3.5 h-3.5 animate-pulse" />
+              <Network className="w-3.5 h-3.5 text-primary" />
             ) : tab === "edits" ? (
               <Code2 className="w-3.5 h-3.5 text-primary" />
             ) : tab === "team" ? (
@@ -168,7 +168,7 @@ export function MissionControlCast({ tab, project, className }: MissionControlCa
           </div>
 
           <div className="hidden sm:flex items-center gap-2 text-muted-foreground text-xs font-mono">
-            <Radio className="w-3 h-3 text-emerald-500 animate-pulse" />
+            <Radio className="w-3 h-3 text-emerald-500" />
             <span className="text-foreground font-semibold">Live Cast</span>
             <span className="text-muted-foreground/70">| Sub-ms Mutex Bus</span>
           </div>

@@ -18,9 +18,8 @@ export function HeroProductVisual() {
               latch-session: main (3 parallel agents)
             </span>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-primary/10 text-primary border border-primary/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Synchronized
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono bg-muted text-muted-foreground border border-border">
+            <span>Synchronized</span>
           </span>
         </div>
 

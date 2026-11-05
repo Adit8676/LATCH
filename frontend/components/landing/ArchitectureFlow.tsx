@@ -161,8 +161,7 @@ export function ArchitectureFlow() {
               </p>
 
               <div className="mt-3.5 pt-3 border-t border-border">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-muted border border-border text-[10px] font-mono text-primary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-muted border border-border text-[10px] font-mono text-muted-foreground">
                   <span>Port 3001 Socket</span>
                 </div>
               </div>

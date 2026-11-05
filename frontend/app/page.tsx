@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LoadingCurtain } from "@/components/landing/LoadingCurtain";
@@ -8,7 +9,6 @@ import { ProblemSolutionSplit } from "@/components/landing/ProblemSolutionSplit"
 import { ArchitectureFlow } from "@/components/landing/ArchitectureFlow";
 import { QuickStartTerminal } from "@/components/landing/QuickStartTerminal";
 import { LiveActivityStream } from "@/components/landing/LiveActivityStream";
-import { FourPillarsGrid } from "@/components/landing/FourPillarsGrid";
 import { PricingTiers } from "@/components/landing/PricingTiers";
 import { StatsMarquee } from "@/components/kinetic/StatsMarquee";
 import { AgentMarquee } from "@/components/kinetic/AgentMarquee";
@@ -16,7 +16,7 @@ import { AiEvolutionOrbit } from "@/components/landing/AiEvolutionOrbit";
 import { DecoButton } from "@/components/deco/DecoButton";
 import { DecoDivider } from "@/components/deco/DecoDivider";
 import { HalftoneWordmarkFooter } from "@/components/ui/halftone-wordmark-footer";
-import { Sparkles, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { Sparkles, ArrowUpRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -42,32 +42,30 @@ export default function Home() {
         {/* Hero Section */}
         <section className="px-4 sm:px-6 max-w-6xl mx-auto pt-10 md:pt-16 pb-8 text-center">
           <div className="flex flex-col items-center">
-            {/* Tagline Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-mono font-medium text-primary">
-                CROSS-AGENT COORDINATION LAYER
+            {/* Clean Hero Headline with Library 3 AM Font (Strict 2 Lines) */}
+            <h1 className="w-full max-w-5xl mx-auto font-library3am tracking-wide uppercase text-center leading-[1.15] select-none my-3">
+              <span className="block text-[clamp(1.4rem,4.8vw,3.75rem)] text-foreground whitespace-nowrap">
+                Build at Machine Speed.
               </span>
-              <span className="text-xs text-muted-foreground">·</span>
-              <span className="text-xs font-mono text-muted-foreground">
-                ZERO OVERWRITES
+              <span className="block text-[clamp(1.15rem,4.1vw,3.25rem)] text-primary whitespace-nowrap mt-1 sm:mt-2">
+                ZERO Collision. ZERO Chaos.
               </span>
-            </div>
-
-            {/* Clean Hero Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-[var(--font-display)] font-extrabold text-foreground tracking-tight max-w-4xl leading-[1.15]">
-              Build at Machine Speed. <br className="hidden sm:inline" />
-              <span className="text-primary"> ZERO Collision. </span>
-              <span className="text-primary"> ZERO Chaos. </span>
             </h1>
 
-            {/* Description */}
+            {/* Description with Latch Logo */}
             <p className="mt-4 text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed font-[var(--font-body)]">
                Humans commit minutes apart.{" "}
-              <strong className="text-foreground font-medium">
-                Latch coordinates autonomous AI agents editing the same files in real time
+              <strong className="text-foreground font-medium inline-flex items-center gap-1.5 flex-wrap justify-center align-middle">
+                <Image
+                  src="/latch-logo.png"
+                  alt="Latch"
+                  width={68}
+                  height={16}
+                  className="h-4 sm:h-4.5 w-auto inline-block object-contain dark:invert"
+                />
+                <span>coordinates autonomous AI agents editing the same files in real time</span>
               </strong>{" "}
-              — exclusive write locks, dependency blast radius checks, and live causal patch sync.
+              
             </p>
 
             {/* Two Action Mechanisms: Free & Pro */}
@@ -89,17 +87,6 @@ export default function Home() {
                   Get Pro Access
                 </DecoButton>
               </Link>
-            </div>
-
-            <div className="mt-4 flex items-center gap-4 text-xs font-mono text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                Zero Cloud Lock-in
-              </span>
-              <span>·</span>
-              <span>Local Daemon on Port 3001</span>
-              <span>·</span>
-              <span>Open Source Core</span>
             </div>
 
             {/* 3D Perspective Layered Product Visual */}
@@ -147,14 +134,8 @@ export default function Home() {
         <DecoDivider title="How It Works" />
 
         {/* 03 How It Works Architecture Flow */}
-        <ArchitectureFlow />
-
-        {/* Divider */}
-        <DecoDivider title="System Architecture" />
-
-        {/* Four Pillars Section */}
         <div id="features">
-          <FourPillarsGrid />
+          <ArchitectureFlow />
         </div>
 
         {/* Quick Start Terminal */}

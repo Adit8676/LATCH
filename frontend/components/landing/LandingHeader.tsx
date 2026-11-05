@@ -11,25 +11,18 @@ export function LandingHeader() {
     <header className="fixed top-0 left-0 right-0 z-40 bg-background/85 backdrop-blur-md border-b border-border transition-colors duration-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-[var(--radius)] overflow-hidden flex items-center justify-center border border-border bg-card shadow-sm group-hover:border-primary/50 transition-colors p-0.5">
-            <Image
-              src="/latch-logo.png"
-              alt="Latch Logo"
-              width={32}
-              height={32}
-              className="w-full h-full object-contain"
-              priority
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-[var(--font-display)] tracking-tight text-lg font-bold text-foreground">
-              Latch
-            </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border hidden sm:inline">
-              v2.4
-            </span>
-          </div>
+        <Link href="/" className="flex items-center gap-2 group" title="Latch">
+          <Image
+            src="/latch-logo.png"
+            alt="Latch Logo"
+            width={120}
+            height={28}
+            className="h-7 sm:h-8 w-auto object-contain dark:invert group-hover:opacity-85 transition-opacity"
+            priority
+          />
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border hidden sm:inline">
+            v2.4
+          </span>
         </Link>
 
         {/* Navigation Links */}

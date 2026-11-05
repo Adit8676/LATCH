@@ -57,20 +57,15 @@ export default function LoginPage() {
       </div>
 
       {/* Brand Header */}
-      <Link href="/" className="mb-6 flex items-center gap-2.5 group">
-        <div className="w-9 h-9 rounded-md overflow-hidden flex items-center justify-center border border-border bg-card shadow-sm group-hover:border-primary/50 transition-colors p-0.5">
-          <Image
-            src="/latch-logo.png"
-            alt="Latch Logo"
-            width={36}
-            height={36}
-            className="w-full h-full object-contain"
-            priority
-          />
-        </div>
-        <span className="font-[var(--font-display)] text-xl font-bold text-foreground">
-          Latch
-        </span>
+      <Link href="/" className="mb-6 flex items-center gap-2.5 group" title="Latch">
+        <Image
+          src="/latch-logo.png"
+          alt="Latch"
+          width={130}
+          height={32}
+          className="h-8 w-auto object-contain dark:invert group-hover:opacity-85 transition-opacity"
+          priority
+        />
       </Link>
 
       <div className="w-full max-w-md bg-card border border-border rounded-lg p-6 sm:p-8 shadow-sm text-card-foreground">

@@ -294,7 +294,7 @@ export default function DashboardPage() {
               alt="Latch Systems"
               width={32}
               height={32}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain dark:invert"
               priority
             />
           </Link>
@@ -618,7 +618,7 @@ export default function DashboardPage() {
                         </div>
                       ) : (
                         <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-mono text-primary shrink-0">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                           <span>ACTIVE</span>
                         </div>
                       )}

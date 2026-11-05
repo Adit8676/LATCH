@@ -83,20 +83,15 @@ export function LoadingCurtain() {
         <div className="mb-4 flex items-center justify-center">
           <ThinkingOrb state="weaving" size={64} />
         </div>
-        <div className="flex items-center gap-3 mb-1.5">
-          <div className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center shadow-md border border-border bg-card p-0.5">
-            <Image
-              src="/latch-logo.png"
-              alt="Latch Logo"
-              width={36}
-              height={36}
-              className="w-full h-full object-contain"
-              priority
-            />
-          </div>
-          <h1 className="font-[var(--font-display)] text-2xl font-bold tracking-tight text-foreground">
-            Latch
-          </h1>
+        <div className="flex items-center justify-center mb-2">
+          <Image
+            src="/latch-logo.png"
+            alt="Latch Logo"
+            width={140}
+            height={34}
+            className="h-8 sm:h-9 w-auto object-contain dark:invert"
+            priority
+          />
         </div>
         <p className="font-mono text-[11px] uppercase tracking-wider text-primary font-semibold">
           Zero-Collision AI Swarm Engine

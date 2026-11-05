@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Library 3 am';
+  src: url('/fonts/Library3am.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-library3am {
+  font-family: var(--font-library-3am), 'Library 3 am', sans-serif;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
@@ -43,6 +55,7 @@
   --surface-hover: var(--accent);
   --font-display: "Space Grotesk", sans-serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-library-3am: "Library 3 am", "Space Grotesk", sans-serif;
 }
 
 .dark {
