@@ -38,10 +38,21 @@ import { RenderService } from "../../../serverboard/services/renderService.js";
 import { spawn } from "node:child_process";
 
 describe("RenderService (serverboard/services/renderService.js)", () => {
+  let savedEnv = {};
+
   beforeEach(() => {
+    savedEnv = { ...process.env };
+    delete process.env.RENDER_ENVIRONMENT_ID;
+    delete process.env.ENV_GROUP_ID;
+    delete process.env.YOUR_AUTHTOKEN;
+    delete process.env.NGROK_AUTHTOKEN;
     vi.clearAllMocks();
     spawnCalls = [];
     nextSpawnBehavior = null;
+  });
+
+  afterEach(() => {
+    process.env = savedEnv;
   });
 
   describe("createService()", () => {

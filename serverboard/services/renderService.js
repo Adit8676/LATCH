@@ -80,12 +80,13 @@ export const RenderService = {
   },
 
   async resolveEnvGroupId(envGroupId = process.env.ENV_GROUP_ID, environmentId = process.env.RENDER_ENVIRONMENT_ID) {
+    if (!envGroupId && !environmentId) return null;
     if (envGroupId && envGroupId.startsWith("evg-")) {
       return envGroupId;
     }
     const targetEnvId = (envGroupId && envGroupId.startsWith("evm-")) ? envGroupId : environmentId;
     const apiKey = process.env.RENDER_API_KEY;
-    if (!apiKey) return envGroupId;
+    if (!apiKey || process.env.VITEST) return envGroupId || null;
 
     try {
       const res = await fetch("https://api.render.com/v1/env-groups?limit=50", {
@@ -107,7 +108,7 @@ export const RenderService = {
     } catch (err) {
       console.warn("[renderService] auto-resolve env group error:", err.message);
     }
-    return envGroupId;
+    return envGroupId || null;
   },
 
   async linkEnvGroup(serviceId, rawEnvGroupId = process.env.ENV_GROUP_ID, environmentId = process.env.RENDER_ENVIRONMENT_ID) {
@@ -146,6 +147,27 @@ export const RenderService = {
     }
   },
 
+  async getEnvGroupVars(envGroupId) {
+    if (!envGroupId) return [];
+    const apiKey = process.env.RENDER_API_KEY;
+    if (!apiKey || process.env.VITEST) return [];
+    try {
+      const res = await fetch(`https://api.render.com/v1/env-groups/${envGroupId}`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return Array.isArray(data.envVars) ? data.envVars : [];
+      }
+    } catch (err) {
+      console.warn("[renderService] Failed to fetch env group vars:", err.message);
+    }
+    return [];
+  },
+
   async createService({
     name,
     repo,
@@ -155,6 +177,9 @@ export const RenderService = {
     environmentId = process.env.RENDER_ENVIRONMENT_ID,
     envGroupId = process.env.ENV_GROUP_ID,
   }) {
+    const resolvedGroupId = await this.resolveEnvGroupId(envGroupId, environmentId);
+    const groupVars = resolvedGroupId ? await this.getEnvGroupVars(resolvedGroupId) : [];
+
     const args = [
       "services", "create",
       "--name", name,
@@ -168,13 +193,27 @@ export const RenderService = {
     if (environmentId) {
       args.push("--environment-id", environmentId);
     }
+
+    // Inject all variables from the env group directly into initial service creation
+    for (const v of groupVars) {
+      if (v.key && v.value) {
+        args.push("--env-var", `${v.key}=${v.value}`);
+      }
+    }
+
+    // Also inject local YOUR_AUTHTOKEN / NGROK_AUTHTOKEN if not already in groupVars
+    const localToken = process.env.YOUR_AUTHTOKEN || process.env.NGROK_AUTHTOKEN;
+    if (localToken && !groupVars.some(v => v.key === "YOUR_AUTHTOKEN" || v.key === "NGROK_AUTHTOKEN")) {
+      args.push("--env-var", `NGROK_AUTHTOKEN=${localToken}`);
+    }
+
     args.push("-o", "json", "--confirm");
     const output = await runCli(args);
     const result = JSON.parse(output);
 
     const serviceId = result?.id || result?.service?.id;
-    if (serviceId) {
-      await this.linkEnvGroup(serviceId, envGroupId, environmentId).catch(err => {
+    if (serviceId && resolvedGroupId) {
+      await this.linkEnvGroup(serviceId, resolvedGroupId, environmentId).catch(err => {
         console.warn("[renderService] Auto-link env group error:", err.message || err);
       });
     }
