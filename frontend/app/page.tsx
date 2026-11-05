@@ -9,16 +9,12 @@ import { HeroRadialLight } from "@/components/landing/HeroRadialLight";
 import { HeroProductVisual } from "@/components/landing/HeroProductVisual";
 import { ProblemSolutionSplit } from "@/components/landing/ProblemSolutionSplit";
 import { ArchitectureFlow } from "@/components/landing/ArchitectureFlow";
-import { QuickStartTerminal } from "@/components/landing/QuickStartTerminal";
-import { LiveActivityStream } from "@/components/landing/LiveActivityStream";
-import { PricingTiers } from "@/components/landing/PricingTiers";
-import { StatsMarquee } from "@/components/kinetic/StatsMarquee";
 import { AgentMarquee } from "@/components/kinetic/AgentMarquee";
-import { AiEvolutionOrbit } from "@/components/landing/AiEvolutionOrbit";
 import { DecoButton } from "@/components/deco/DecoButton";
 import { DecoDivider } from "@/components/deco/DecoDivider";
 import { HalftoneWordmarkFooter } from "@/components/ui/halftone-wordmark-footer";
-import { Sparkles, ArrowUpRight } from "lucide-react";
+import { IconArrowUpRight } from "@/components/icons/LatchIcons";
+import { Sparkles } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -86,7 +82,7 @@ export default function Home() {
                 <DecoButton variant="solid" size="lg" className="px-6 py-2.5 sm:px-7 sm:py-3 text-sm sm:text-base">
                   <span className="inline-flex items-center gap-2 font-semibold">
                     <span>Start for Free</span>
-                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <IconArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </span>
                 </DecoButton>
               </Link>
@@ -109,57 +105,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats Strip */}
-        <div className="my-6">
-          <StatsMarquee />
-        </div>
-
         {/* 01 The Problem vs 02 The Solution */}
         <ProblemSolutionSplit />
 
-        {/* Live Activity Stream & Telemetry */}
-        <section id="stream" className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-xs font-mono font-medium uppercase tracking-wider text-primary">
-              Live Protocol Simulation
-            </span>
-            <span className="text-xs font-mono text-muted-foreground">
-              Socket: Active (0.8ms latency)
-            </span>
-          </div>
-          <LiveActivityStream />
-        </section>
-
-        {/* Agent Marquee Strip */}
-        <div className="my-6">
-          <AgentMarquee />
-        </div>
-
         {/* Divider */}
-        <DecoDivider title="Evolution Timeline" />
+        <DecoDivider title="System Architecture" />
 
-        {/* Orbit Timeline: Evolution of AI */}
-        <div id="evolution">
-          <AiEvolutionOrbit />
-        </div>
-
-        {/* Divider */}
-        <DecoDivider title="How It Works" />
-
-        {/* 03 How It Works Architecture Flow */}
+        {/* 03 System Architecture Flow: Directly following the problem & solution */}
         <div id="features">
           <ArchitectureFlow />
         </div>
 
-        {/* Quick Start Terminal */}
-        <QuickStartTerminal />
-
-        {/* Divider */}
-        <DecoDivider title="Access Tiers" />
-
-        {/* Pricing Tiers Section */}
-        <div id="pricing">
-          <PricingTiers />
+        {/* Agent Marquee Strip */}
+        <div className="my-8">
+          <AgentMarquee />
         </div>
 
         {/* Interactive Halftone Wordmark Footer */}
@@ -188,8 +147,7 @@ export default function Home() {
                 title: "Protocol",
                 links: [
                   { label: "Architecture", href: "#features" },
-                  { label: "Telemetry Stream", href: "#stream" },
-                  { label: "Agent Evolution", href: "#evolution" },
+                  { label: "Locks & Mutex", href: "#problem-solution" },
                 ],
               },
               {

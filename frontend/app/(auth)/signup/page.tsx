@@ -6,7 +6,8 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DecoButton } from "@/components/deco/DecoButton";
 import { DecoInput } from "@/components/deco/DecoInput";
-import { Sparkles, Terminal, ArrowUpRight } from "lucide-react";
+import { IconArrowUpRight, IconTerminalPrompt } from "@/components/icons/LatchIcons";
+import { Sparkles } from "lucide-react";
 import { GithubIcon } from "@/components/icons/GithubIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { api } from "@/lib/api";
@@ -107,7 +108,7 @@ function SignupForm() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Terminal className="w-3.5 h-3.5 text-primary" />
+            <IconTerminalPrompt className="w-3.5 h-3.5 text-primary" />
             Community ($0)
           </button>
           <button
@@ -203,7 +204,7 @@ function SignupForm() {
             className="text-primary font-medium hover:underline text-xs inline-flex items-center gap-1"
           >
             <span>Sign in</span>
-            <ArrowUpRight className="w-3 h-3" />
+            <IconArrowUpRight className="w-3 h-3" />
           </Link>
         </div>
       </div>

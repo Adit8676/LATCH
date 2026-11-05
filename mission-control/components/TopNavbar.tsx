@@ -158,10 +158,7 @@ export function TopNavbar() {
           <span className={ui.menuBar} />
           <span className={ui.menuBar} />
         </button>
-        <img src="/logo_transparent.png" alt="./latch" className={ui.navBrandLogo} />
-        <span className={ui.navBrandText}>
-          <span className={ui.navBrandSlash}>./</span>latch
-        </span>
+        <img src="/latch-logo.png" alt="Latch" className={ui.navBrandLogo} />
       </div>
 
       <div

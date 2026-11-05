@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Newsreader } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-display",
+const newsreader = Newsreader({
+  variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 const library3am = localFont({
@@ -41,7 +37,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${spaceGrotesk.variable} ${inter.variable} ${library3am.variable} h-full antialiased`}
+      className={`${newsreader.variable} ${library3am.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />

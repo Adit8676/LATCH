@@ -1,104 +1,209 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 export function HeroRadialLight() {
+  const [colorMode, setColorMode] = useState<"green" | "red" | "brown">("green");
+
+  useEffect(() => {
+    let cachedPsTop = 800;
+    let cachedArchTop = 1800;
+    let cachedWindowH = typeof window !== "undefined" ? window.innerHeight : 900;
+
+    // Cache layout offsets to eliminate layout thrashing during scroll
+    const measureLayout = () => {
+      cachedWindowH = window.innerHeight;
+      const psEl = document.getElementById("problem-solution");
+      const archEl = document.getElementById("features");
+      if (psEl) cachedPsTop = psEl.offsetTop;
+      if (archEl) cachedArchTop = archEl.offsetTop;
+    };
+
+    measureLayout();
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const psTop = cachedPsTop - cachedWindowH * 0.45;
+      const archTop = cachedArchTop - cachedWindowH * 0.55;
+
+      if (scrollY >= archTop) {
+        setColorMode("brown");
+      } else if (scrollY >= psTop) {
+        setColorMode("red");
+      } else {
+        setColorMode("green");
+      }
+    };
+
+    const handleResize = () => {
+      measureLayout();
+      handleScroll();
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const isLeft = colorMode === "brown";
+
+  const outerTransformClass = isLeft
+    ? "-translate-x-[240px] sm:-translate-x-[310px] md:-translate-x-[360px]"
+    : "translate-x-[240px] sm:translate-x-[310px] md:translate-x-[360px]";
+
+  const innerTransformClass = isLeft
+    ? "-translate-x-[230px] sm:-translate-x-[290px] md:-translate-x-[340px]"
+    : "translate-x-[230px] sm:translate-x-[290px] md:translate-x-[340px]";
+
   return (
     <div
-      className="absolute top-0 left-0 right-0 w-full h-[1500px] pointer-events-none z-0 overflow-hidden select-none"
+      className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden select-none"
       aria-hidden="true"
+      style={{ contain: "strict" }}
     >
       {/* 
-        Outer Diffuse Aura:
-        - 1.7x enlarged diameter (up to 2300px × 1620px)
-        - Anchor: Shifted downwards level with headline (top: ~380px)
-        - 1.5x amplified shape-shifting and fluid rotational wave morph
+        ============================================================
+        OUTER AURA ANCHOR (Large expansive radius: up to 2300px)
+        Hardware-accelerated smooth CSS transition from right to left
+        ============================================================
       */}
       <div
-        className="absolute left-[calc(50%+240px)] sm:left-[calc(50%+310px)] md:left-[calc(50%+360px)] top-[340px] sm:top-[380px] md:top-[410px] w-[1450px] sm:w-[1850px] md:w-[2300px] h-[1050px] sm:h-[1350px] md:h-[1620px] pointer-events-none aura-outer"
-        style={{
-          background:
-            "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(55, 160, 115, 0.20) 0%, rgba(28, 90, 65, 0.11) 38%, rgba(14, 45, 32, 0.03) 65%, rgba(0, 0, 0, 0) 82%)",
-          filter: "blur(115px)",
-        }}
-      />
+        className={`absolute top-[240px] sm:top-[280px] md:top-[320px] left-1/2 pointer-events-none transition-transform duration-1000 ease-in-out ${outerTransformClass}`}
+        style={{ willChange: "transform" }}
+      >
+        {/* Green Outer Layer */}
+        <div
+          className={`absolute left-0 top-0 w-[1450px] sm:w-[1850px] md:w-[2300px] h-[1050px] sm:h-[1350px] md:h-[1620px] pointer-events-none aura-outer transition-opacity duration-1000 ease-out ${
+            colorMode === "green" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            background:
+              "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(55, 160, 115, 0.20) 0%, rgba(28, 90, 65, 0.11) 38%, rgba(14, 45, 32, 0.03) 65%, rgba(0, 0, 0, 0) 82%)",
+            filter: "blur(100px)",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+
+        {/* Red Outer Layer */}
+        <div
+          className={`absolute left-0 top-0 w-[1450px] sm:w-[1850px] md:w-[2300px] h-[1050px] sm:h-[1350px] md:h-[1620px] pointer-events-none aura-outer transition-opacity duration-1000 ease-out ${
+            colorMode === "red" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            background:
+              "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(229, 77, 46, 0.22) 0%, rgba(160, 45, 30, 0.12) 38%, rgba(80, 20, 15, 0.03) 65%, rgba(0, 0, 0, 0) 82%)",
+            filter: "blur(100px)",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+
+        {/* Brown Outer Layer */}
+        <div
+          className={`absolute left-0 top-0 w-[1450px] sm:w-[1850px] md:w-[2300px] h-[1050px] sm:h-[1350px] md:h-[1620px] pointer-events-none aura-outer transition-opacity duration-1000 ease-out ${
+            colorMode === "brown" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            background:
+              "radial-gradient(ellipse 65% 55% at 50% 48%, rgba(150, 105, 80, 0.24) 0%, rgba(100, 74, 64, 0.13) 38%, rgba(55, 38, 30, 0.04) 65%, rgba(0, 0, 0, 0) 82%)",
+            filter: "blur(100px)",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+      </div>
 
       {/* 
-        Inner Luminous Core:
-        - 1.7x enlarged diameter (up to 1360px × 990px)
-        - Shifted downwards level with headline text
-        - Asynchronous counter-rhythm
+        ============================================================
+        INNER CORE ANCHOR (Large core radius: up to 1360px)
+        Hardware-accelerated smooth CSS transition from right to left
+        ============================================================
       */}
       <div
-        className="absolute left-[calc(50%+230px)] sm:left-[calc(50%+290px)] md:left-[calc(50%+340px)] top-[340px] sm:top-[380px] md:top-[410px] w-[820px] sm:w-[1100px] md:w-[1360px] h-[600px] sm:h-[800px] md:h-[990px] pointer-events-none aura-inner"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 52% 46%, rgba(85, 200, 148, 0.32) 0%, rgba(52, 150, 108, 0.20) 30%, rgba(25, 85, 60, 0.08) 58%, rgba(10, 35, 24, 0) 78%)",
-          filter: "blur(68px)",
-        }}
-      />
-
-      {/* Subtle organic micro-noise film grain preventing gradient banding */}
-      <svg
-        className="absolute inset-0 w-full h-full opacity-[0.035] mix-blend-overlay pointer-events-none"
-        xmlns="http://www.w3.org/2000/svg"
+        className={`absolute top-[240px] sm:top-[280px] md:top-[320px] left-1/2 pointer-events-none transition-transform duration-1000 ease-in-out ${innerTransformClass}`}
+        style={{ willChange: "transform" }}
       >
-        <filter id="hero-radial-grain">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.75"
-            numOctaves="3"
-            stitchTiles="stitch"
-          />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-        <rect width="100%" height="100%" filter="url(#hero-radial-grain)" />
-      </svg>
+        {/* Green Inner Core */}
+        <div
+          className={`absolute left-0 top-0 w-[820px] sm:w-[1100px] md:w-[1360px] h-[600px] sm:h-[800px] md:h-[990px] pointer-events-none aura-inner transition-opacity duration-1000 ease-out ${
+            colorMode === "green" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 50% at 52% 46%, rgba(85, 200, 148, 0.32) 0%, rgba(52, 150, 108, 0.20) 30%, rgba(25, 85, 60, 0.08) 58%, rgba(10, 35, 24, 0) 78%)",
+            filter: "blur(65px)",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+
+        {/* Red Inner Core */}
+        <div
+          className={`absolute left-0 top-0 w-[820px] sm:w-[1100px] md:w-[1360px] h-[600px] sm:h-[800px] md:h-[990px] pointer-events-none aura-inner transition-opacity duration-1000 ease-out ${
+            colorMode === "red" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 50% at 52% 46%, rgba(245, 95, 65, 0.35) 0%, rgba(200, 60, 40, 0.22) 30%, rgba(120, 32, 22, 0.09) 58%, rgba(40, 10, 8, 0) 78%)",
+            filter: "blur(65px)",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+
+        {/* Brown Inner Core */}
+        <div
+          className={`absolute left-0 top-0 w-[820px] sm:w-[1100px] md:w-[1360px] h-[600px] sm:h-[800px] md:h-[990px] pointer-events-none aura-inner transition-opacity duration-1000 ease-out ${
+            colorMode === "brown" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 50% at 52% 46%, rgba(195, 135, 100, 0.36) 0%, rgba(145, 95, 72, 0.23) 30%, rgba(90, 55, 40, 0.10) 58%, rgba(45, 25, 18, 0) 78%)",
+            filter: "blur(65px)",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+      </div>
 
       <style jsx>{`
-        /* Outer boundary: 1.5x amplified shape-shifting morph & rotational drift */
+        /* Smooth GPU-only transform animations */
         .aura-outer {
-          animation: morphOuter 16s ease-in-out infinite alternate;
-          transform-origin: 50% 48%;
-          will-change: transform, border-radius;
+          animation: morphOuter 18s ease-in-out infinite alternate;
+          transform-origin: 50% 50%;
+          will-change: transform;
         }
 
-        /* Inner core: 1.5x amplified organic morph with independent counter rhythm */
         .aura-inner {
-          animation: morphInner 11s ease-in-out infinite alternate;
-          transform-origin: 52% 46%;
-          will-change: transform, border-radius;
+          animation: morphInner 12s ease-in-out infinite alternate;
+          transform-origin: 50% 50%;
+          will-change: transform;
         }
 
         @keyframes morphOuter {
           0% {
-            border-radius: 74% 26% 62% 38% / 38% 70% 30% 62%;
-            transform: translate(-50%, -50%) rotate(0deg) scale(1, 0.84);
+            transform: translate(-50%, -50%) rotate(0deg) scale(1, 0.85);
           }
           33% {
-            border-radius: 38% 62% 26% 74% / 65% 35% 65% 35%;
-            transform: translate(-54%, -46%) rotate(38deg) scale(1.14, 0.80);
+            transform: translate(-50%, -50%) rotate(28deg) scale(1.12, 0.82);
           }
           66% {
-            border-radius: 32% 68% 68% 32% / 70% 30% 70% 30%;
-            transform: translate(-46%, -54%) rotate(-32deg) scale(0.90, 1.08);
+            transform: translate(-50%, -50%) rotate(-24deg) scale(0.92, 1.06);
           }
           100% {
-            border-radius: 66% 34% 40% 60% / 44% 68% 32% 56%;
-            transform: translate(-52%, -48%) rotate(24deg) scale(1.08, 0.88);
+            transform: translate(-50%, -50%) rotate(18deg) scale(1.06, 0.88);
           }
         }
 
         @keyframes morphInner {
           0% {
-            border-radius: 68% 32% 40% 60% / 36% 64% 36% 64%;
-            transform: translate(-50%, -50%) rotate(0deg) scale(1, 0.85);
+            transform: translate(-50%, -50%) rotate(0deg) scale(1, 0.86);
           }
           50% {
-            border-radius: 32% 68% 68% 32% / 68% 32% 68% 32%;
-            transform: translate(-55%, -45%) rotate(-50deg) scale(1.18, 0.78);
+            transform: translate(-50%, -50%) rotate(-32deg) scale(1.14, 0.80);
           }
           100% {
-            border-radius: 46% 54% 34% 66% / 40% 60% 40% 60%;
-            transform: translate(-45%, -55%) rotate(38deg) scale(0.88, 1.14);
+            transform: translate(-50%, -50%) rotate(26deg) scale(0.90, 1.10);
           }
         }
 

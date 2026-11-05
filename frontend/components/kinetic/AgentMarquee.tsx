@@ -1,14 +1,20 @@
 "use client";
 
 import Marquee from "react-fast-marquee";
-import { Terminal, ShieldCheck, Lock, GitPullRequest, Zap } from "lucide-react";
+import {
+  IconMutexLock,
+  IconConflictShear,
+  IconCausalBus,
+  IconCheck,
+  IconTerminalPrompt,
+} from "@/components/icons/LatchIcons";
 
 const events = [
-  { agent: "Cursor", action: "LOCKED", file: "src/engine/lock_table.rs", icon: <Lock className="w-3 h-3" /> },
-  { agent: "Claude Code", action: "BLOCKED", file: "src/engine/lock_table.rs (held by Cursor)", icon: <Zap className="w-3 h-3" /> },
-  { agent: "Antigravity", action: "SYNCED", file: "tests/concurrency_test.py", icon: <GitPullRequest className="w-3 h-3" /> },
-  { agent: "Codex CLI", action: "RELEASED", file: "docs/architecture.md", icon: <ShieldCheck className="w-3 h-3" /> },
-  { agent: "Copilot Workspace", action: "CLAIMED", file: "crates/latch-ast/src/parser.rs", icon: <Terminal className="w-3.5 h-3.5" /> },
+  { agent: "Cursor", action: "LOCKED", file: "src/engine/lock_table.rs", icon: <IconMutexLock className="w-3.5 h-3.5" /> },
+  { agent: "Claude Code", action: "BLOCKED", file: "src/engine/lock_table.rs (held by Cursor)", icon: <IconConflictShear className="w-3.5 h-3.5" /> },
+  { agent: "Antigravity", action: "SYNCED", file: "tests/concurrency_test.py", icon: <IconCausalBus className="w-3.5 h-3.5" /> },
+  { agent: "Codex CLI", action: "RELEASED", file: "docs/architecture.md", icon: <IconCheck className="w-3.5 h-3.5" /> },
+  { agent: "Copilot Workspace", action: "CLAIMED", file: "crates/latch-ast/src/parser.rs", icon: <IconTerminalPrompt className="w-3.5 h-3.5" /> },
 ];
 
 export function AgentMarquee() {

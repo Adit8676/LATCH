@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Lock, Check, ShieldCheck, RefreshCw, AlertTriangle } from "lucide-react";
+import { IconMutexLock, IconCheck } from "@/components/icons/LatchIcons";
 
 export function HeroProductVisual() {
   return (
@@ -79,7 +79,7 @@ export function HeroProductVisual() {
             <div>
               <div className="flex items-center justify-between pb-2 border-b border-border text-[11px] text-muted-foreground mb-2">
                 <span className="flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-primary" />
+                  <IconMutexLock className="w-3.5 h-3.5 text-primary" />
                   src/auth/token_engine.ts
                 </span>
                 <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.2 rounded font-bold">
@@ -108,7 +108,7 @@ export function HeroProductVisual() {
             {/* Bottom In-flight Status Pill */}
             <div className="mt-3 pt-2 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground">
               <span className="flex items-center gap-1">
-                <Check className="w-3 h-3 text-primary" />
+                <IconCheck className="w-3.5 h-3.5 text-primary" />
                 AST Validated
               </span>
               <span>1 lock held · 0 queued</span>

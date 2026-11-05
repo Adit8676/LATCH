@@ -9,7 +9,7 @@ import { DecoInput } from "@/components/deco/DecoInput";
 import { GithubIcon } from "@/components/icons/GithubIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { api } from "@/lib/api";
-import { ArrowUpRight } from "lucide-react";
+import { IconArrowUpRight } from "@/components/icons/LatchIcons";
 import { ThinkingOrb } from "thinking-orbs";
 
 /** Render sign-in options for backend GitHub OAuth and a local email session. */
@@ -149,7 +149,7 @@ export default function LoginPage() {
             className="text-primary font-medium hover:underline text-xs inline-flex items-center gap-1"
           >
             <span>Register free</span>
-            <ArrowUpRight className="w-3 h-3" />
+            <IconArrowUpRight className="w-3 h-3" />
           </Link>
         </div>
       </div>

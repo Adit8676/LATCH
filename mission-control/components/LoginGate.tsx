@@ -86,11 +86,11 @@ export function LoginGate() {
             <span className="text-[#b4b4b4]">Local Mutex Bus</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-sans flex items-center justify-center gap-2">
-            <span className="text-[#ffe0c2]">./latch</span>
-            <span className="text-neutral-500 font-light">/</span>
-            <span>Studio</span>
-          </h1>
+          <div className="flex items-center justify-center gap-2.5">
+            <img src="/latch-logo.png" alt="Latch" className="h-8 sm:h-9 w-auto object-contain invert" />
+            <span className="text-neutral-500 font-light text-2xl">/</span>
+            <span className="text-xl sm:text-2xl font-bold font-[var(--font-display)] text-white">Studio</span>
+          </div>
 
           <p className="text-xs sm:text-sm text-[#b4b4b4] max-w-md mx-auto leading-relaxed">
             Multi-agent concurrency dashboard, real-time distributed file locks, and AST dependency graph.

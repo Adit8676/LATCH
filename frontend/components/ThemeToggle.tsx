@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { Sun, Moon } from "lucide-react"
+import { IconSun, IconMoon } from "@/components/icons/LatchIcons"
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { setTheme, resolvedTheme } = useTheme()
@@ -28,9 +28,9 @@ export function ThemeToggle({ className }: { className?: string }) {
       className={`relative inline-flex items-center justify-center w-8 h-8 rounded-md border border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-200 cursor-pointer shadow-sm ${className || ""}`}
     >
       {isDark ? (
-        <Sun className="w-4 h-4 text-primary transition-transform duration-200 hover:rotate-45" />
+        <IconSun className="w-4 h-4 text-primary transition-transform duration-200 hover:rotate-45" />
       ) : (
-        <Moon className="w-4 h-4 text-primary transition-transform duration-200 hover:-rotate-12" />
+        <IconMoon className="w-4 h-4 text-primary transition-transform duration-200 hover:-rotate-12" />
       )}
     </button>
   )

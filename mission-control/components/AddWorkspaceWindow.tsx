@@ -222,7 +222,7 @@ export function AddWorkspaceWindow() {
   return (
     <div className={ui.awWindow}>
       <div className={ui.awTitleBar}>
-        <img src="/logo_transparent.png" alt="" />
+        <img src="/latch-logo.png" alt="Latch" style={{ height: "20px", width: "auto", objectFit: "contain", filter: "invert(1)" }} />
         <div className={ui.awTitleText}>
           <strong>Add a workspace</strong>
           <span>Clone from GitHub, attach a folder you already have, or join a friend&apos;s room.</span>

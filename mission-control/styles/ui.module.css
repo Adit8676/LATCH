@@ -51,10 +51,15 @@
   flex: none;
 }
 .navBrandLogo {
-  width: 26px;
-  height: 26px;
+  height: 24px;
+  width: auto;
+  max-width: 120px;
   object-fit: contain;
   flex: none;
+  filter: invert(1);
+}
+:global([data-theme="light"]) .navBrandLogo {
+  filter: invert(0);
 }
 .navBrandText {
   font-family: var(--font-display);

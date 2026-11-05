@@ -437,7 +437,7 @@ function ProjectDashboardContent() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground font-sans antialiased transition-colors duration-200">
+    <div className="min-h-screen flex bg-background text-foreground font-[var(--font-body)] antialiased transition-colors duration-200">
       {/* 1. STATIC LEFT NAVIGATION SIDEBAR */}
       <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col justify-between py-3 shrink-0 z-40 select-none sticky top-0 h-screen overflow-y-auto">
         <div className="flex flex-col gap-3 w-full">
@@ -626,7 +626,7 @@ function ProjectDashboardContent() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2.5">
-                  <h1 className="text-xl font-bold tracking-tight text-foreground font-sans">
+                  <h1 className="text-xl font-bold tracking-tight text-foreground font-[var(--font-display)]">
                     {project.project_name}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-primary/10 border border-primary/20 text-primary uppercase">

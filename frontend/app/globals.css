@@ -8,8 +8,56 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Odida';
+  src: url('/fonts/Odida.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Swansea';
+  src: url('/fonts/Swansea.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Swansea';
+  src: url('/fonts/Swansea-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Asuyo Kowe';
+  src: url('/fonts/AsuyoKowe.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-library3am {
   font-family: var(--font-library-3am), 'Library 3 am', sans-serif;
+}
+
+.font-odida {
+  font-family: var(--font-odida), 'Odida', sans-serif;
+}
+
+.font-swansea {
+  font-family: var(--font-swansea), 'Swansea', sans-serif;
+}
+
+.font-asuyo {
+  font-family: var(--font-asuyo-kowe), 'Asuyo Kowe', var(--font-swansea), sans-serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -53,8 +101,8 @@
   --surface: var(--card);
   --surface-elevated: #f4f4f4;
   --surface-hover: var(--accent);
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-serif), "Newsreader", Georgia, Cambria, serif;
+  --font-body: var(--font-serif), "Newsreader", Georgia, Cambria, serif;
   --font-library-3am: "Library 3 am", "Space Grotesk", sans-serif;
 }
 
@@ -155,7 +203,7 @@
   --sidebar: #f0f0f0;
   --spacing: 0.25rem;
   --font-mono: "Courier New", Courier, monospace;
-  --font-sans: "Architects Daughter", sans-serif;
+  --font-sans: var(--font-body);
   --secondary: #dedede;
   --background: #f9f9f9;
   --font-serif: "Times New Roman", Times, serif;
@@ -185,7 +233,7 @@
 
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
 .dark .graph-canvas-theme,
@@ -207,7 +255,7 @@
   --sidebar: #212121;
   --spacing: 0.25rem;
   --font-mono: "Fira Code", "Courier New", monospace;
-  --font-sans: "Architects Daughter", sans-serif;
+  --font-sans: var(--font-body);
   --secondary: #5a5a5a;
   --background: #2b2b2b;
   --font-serif: Georgia, serif;
@@ -237,7 +285,7 @@
 
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
 @layer base {

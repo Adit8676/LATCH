@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { DecoButton } from "@/components/deco/DecoButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { ArrowUpRight } from "lucide-react";
+import { IconArrowUpRight } from "@/components/icons/LatchIcons";
 
 export function LandingHeader() {
   return (
@@ -27,21 +27,15 @@ export function LandingHeader() {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-muted-foreground">
-          <a href="#evolution" className="hover:text-foreground transition-colors">
-            Evolution
+          <a href="#problem-solution" className="hover:text-foreground transition-colors">
+            Coordination
           </a>
           <a href="#features" className="hover:text-foreground transition-colors">
             Architecture
           </a>
-          <a href="#stream" className="hover:text-foreground transition-colors">
-            Telemetry
-          </a>
-          <a href="#pricing" className="hover:text-foreground transition-colors">
-            Pricing
-          </a>
           <Link href="/dashboard" className="text-primary hover:opacity-80 transition-opacity inline-flex items-center gap-1">
             <span>Cockpit</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <IconArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </nav>
 
