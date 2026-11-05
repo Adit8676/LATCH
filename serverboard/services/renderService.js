@@ -1,3 +1,4 @@
+import "../config/env.js";
 import { spawn } from "node:child_process";
 
 function runRawCli(args, timeoutMs = 60_000) {
@@ -78,9 +79,45 @@ export const RenderService = {
     return false;
   },
 
-  async linkEnvGroup(serviceId, envGroupId = process.env.ENV_GROUP_ID) {
-    if (!serviceId || !envGroupId || serviceId.startsWith("srv-local-")) {
+  async resolveEnvGroupId(envGroupId = process.env.ENV_GROUP_ID, environmentId = process.env.RENDER_ENVIRONMENT_ID) {
+    if (envGroupId && envGroupId.startsWith("evg-")) {
+      return envGroupId;
+    }
+    const targetEnvId = (envGroupId && envGroupId.startsWith("evm-")) ? envGroupId : environmentId;
+    const apiKey = process.env.RENDER_API_KEY;
+    if (!apiKey) return envGroupId;
+
+    try {
+      const res = await fetch("https://api.render.com/v1/env-groups?limit=50", {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+        },
+      });
+      if (res.ok) {
+        const list = await res.json();
+        const groups = Array.isArray(list) ? list.map(item => item.envGroup || item) : [];
+        if (targetEnvId) {
+          const match = groups.find(g => g.environmentId === targetEnvId);
+          if (match?.id) return match.id;
+        }
+        const named = groups.find(g => /latch-prod|latch-secret/i.test(g.name));
+        if (named?.id) return named.id;
+      }
+    } catch (err) {
+      console.warn("[renderService] auto-resolve env group error:", err.message);
+    }
+    return envGroupId;
+  },
+
+  async linkEnvGroup(serviceId, rawEnvGroupId = process.env.ENV_GROUP_ID, environmentId = process.env.RENDER_ENVIRONMENT_ID) {
+    if (!serviceId || serviceId.startsWith("srv-local-")) {
       return { success: true, skipped: true };
+    }
+    const envGroupId = await this.resolveEnvGroupId(rawEnvGroupId, environmentId);
+    if (!envGroupId) {
+      console.warn("[renderService] No valid ENV_GROUP_ID found, skipping link");
+      return { success: false, error: "ENV_GROUP_ID missing" };
     }
     const apiKey = process.env.RENDER_API_KEY;
     if (!apiKey) {
@@ -102,7 +139,7 @@ export const RenderService = {
         return { success: false, status: res.status, error: body };
       }
       console.log(`[renderService] Successfully linked env group ${envGroupId} to service ${serviceId}`);
-      return { success: true };
+      return { success: true, envGroupId };
     } catch (err) {
       console.warn(`[renderService] linkEnvGroup error:`, err.message || err);
       return { success: false, error: err.message || String(err) };
@@ -136,8 +173,8 @@ export const RenderService = {
     const result = JSON.parse(output);
 
     const serviceId = result?.id || result?.service?.id;
-    if (serviceId && envGroupId) {
-      await this.linkEnvGroup(serviceId, envGroupId).catch(err => {
+    if (serviceId) {
+      await this.linkEnvGroup(serviceId, envGroupId, environmentId).catch(err => {
         console.warn("[renderService] Auto-link env group error:", err.message || err);
       });
     }
