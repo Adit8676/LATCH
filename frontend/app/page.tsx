@@ -57,12 +57,13 @@ export default function Home() {
             {/* Clean Hero Headline */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-[var(--font-display)] font-extrabold text-foreground tracking-tight max-w-4xl leading-[1.15]">
               Build at Machine Speed. <br className="hidden sm:inline" />
-              <span className="text-primary">Without File Collisions.</span>
+              <span className="text-primary"> ZERO Collision. </span>
+              <span className="text-primary"> ZERO Chaos. </span>
             </h1>
 
             {/* Description */}
             <p className="mt-4 text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed font-[var(--font-body)]">
-              Git coordinates humans committing minutes apart.{" "}
+               Humans commit minutes apart.{" "}
               <strong className="text-foreground font-medium">
                 Latch coordinates autonomous AI agents editing the same files in real time
               </strong>{" "}
