@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LoadingCurtain } from "@/components/landing/LoadingCurtain";
 import { AnimatedLatchLogo } from "@/components/landing/AnimatedLatchLogo";
+import { HeroRadialLight } from "@/components/landing/HeroRadialLight";
 import { HeroProductVisual } from "@/components/landing/HeroProductVisual";
 import { ProblemSolutionSplit } from "@/components/landing/ProblemSolutionSplit";
 import { ArchitectureFlow } from "@/components/landing/ArchitectureFlow";
@@ -39,13 +40,16 @@ export default function Home() {
       {/* Header */}
       <LandingHeader />
 
-      <main className="flex-1 pt-16 pb-16 relative">
+      <main className="flex-1 pt-16 pb-16 relative overflow-x-clip">
+        {/* Full-width Radial Light Atmosphere (no container clipping) */}
+        <HeroRadialLight />
+
         {/* Hero Section: Contents positioned near center line, with terminal peeking at bottom */}
         <section className="relative px-4 sm:px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
           {/* Spacer positioning hero cluster around the center line */}
           <div className="w-full h-[clamp(40px,calc(28vh-4rem),28vh)] pointer-events-none" aria-hidden="true" />
 
-          <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
+          <div className="w-full max-w-6xl mx-auto flex flex-col items-center relative z-10">
             {/* Blooming Flower Animated Logo with sequenced latch.it text reveal */}
             <div className="mb-4 sm:mb-6">
               <AnimatedLatchLogo size="hero" />
