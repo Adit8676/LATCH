@@ -78,7 +78,46 @@ export const RenderService = {
     return false;
   },
 
-  async createService({ name, repo, branch = "main", region = "singapore", plan = "free", environmentId = process.env.RENDER_ENVIRONMENT_ID }) {
+  async linkEnvGroup(serviceId, envGroupId = process.env.ENV_GROUP_ID) {
+    if (!serviceId || !envGroupId || serviceId.startsWith("srv-local-")) {
+      return { success: true, skipped: true };
+    }
+    const apiKey = process.env.RENDER_API_KEY;
+    if (!apiKey) {
+      console.warn("[renderService] RENDER_API_KEY missing, cannot link environment group");
+      return { success: false, error: "RENDER_API_KEY missing" };
+    }
+    try {
+      const res = await fetch(`https://api.render.com/v1/env-groups/${envGroupId}/services/${serviceId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        console.warn(`[renderService] Failed to link env group ${envGroupId} to service ${serviceId}: ${res.status} ${body}`);
+        return { success: false, status: res.status, error: body };
+      }
+      console.log(`[renderService] Successfully linked env group ${envGroupId} to service ${serviceId}`);
+      return { success: true };
+    } catch (err) {
+      console.warn(`[renderService] linkEnvGroup error:`, err.message || err);
+      return { success: false, error: err.message || String(err) };
+    }
+  },
+
+  async createService({
+    name,
+    repo,
+    branch = "main",
+    region = "singapore",
+    plan = "free",
+    environmentId = process.env.RENDER_ENVIRONMENT_ID,
+    envGroupId = process.env.ENV_GROUP_ID,
+  }) {
     const args = [
       "services", "create",
       "--name", name,
@@ -94,7 +133,16 @@ export const RenderService = {
     }
     args.push("-o", "json", "--confirm");
     const output = await runCli(args);
-    return JSON.parse(output);
+    const result = JSON.parse(output);
+
+    const serviceId = result?.id || result?.service?.id;
+    if (serviceId && envGroupId) {
+      await this.linkEnvGroup(serviceId, envGroupId).catch(err => {
+        console.warn("[renderService] Auto-link env group error:", err.message || err);
+      });
+    }
+
+    return result;
   },
 
   async deleteService(serviceId) {
