@@ -2,10 +2,29 @@
 
 import { useEffect, useState } from "react";
 
-export function HeroRadialLight() {
-  const [colorMode, setColorMode] = useState<"green" | "red" | "brown">("green");
+export interface HeroRadialLightProps {
+  colorMode?: "green" | "red" | "brown" | "auto";
+  position?: "left" | "right" | "center" | "auto";
+  topClass?: string;
+  className?: string;
+}
+
+export function HeroRadialLight({
+  colorMode: propColorMode = "auto",
+  position = "auto",
+  topClass,
+  className = "",
+}: HeroRadialLightProps = {}) {
+  const [colorMode, setColorMode] = useState<"green" | "red" | "brown">(
+    propColorMode === "auto" ? "green" : propColorMode
+  );
 
   useEffect(() => {
+    if (propColorMode !== "auto") {
+      setColorMode(propColorMode);
+      return;
+    }
+
     let cachedPsTop = 800;
     let cachedArchTop = 1800;
     let cachedWindowH = typeof window !== "undefined" ? window.innerHeight : 900;
@@ -48,21 +67,28 @@ export function HeroRadialLight() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [propColorMode]);
 
-  const isLeft = colorMode === "brown";
+  const isLeft = position === "left" || (position === "auto" && colorMode === "brown");
+  const isCenter = position === "center";
 
-  const outerTransformClass = isLeft
+  const outerTransformClass = isCenter
+    ? "translate-x-0"
+    : isLeft
     ? "-translate-x-[240px] sm:-translate-x-[310px] md:-translate-x-[360px]"
     : "translate-x-[240px] sm:translate-x-[310px] md:translate-x-[360px]";
 
-  const innerTransformClass = isLeft
+  const innerTransformClass = isCenter
+    ? "translate-x-0"
+    : isLeft
     ? "-translate-x-[230px] sm:-translate-x-[290px] md:-translate-x-[340px]"
     : "translate-x-[230px] sm:translate-x-[290px] md:translate-x-[340px]";
 
+  const finalTopClass = topClass || "top-[240px] sm:top-[280px] md:top-[320px]";
+
   return (
     <div
-      className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden select-none"
+      className={`fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden select-none ${className}`}
       aria-hidden="true"
       style={{ contain: "strict" }}
     >
@@ -73,7 +99,7 @@ export function HeroRadialLight() {
         ============================================================
       */}
       <div
-        className={`absolute top-[240px] sm:top-[280px] md:top-[320px] left-1/2 pointer-events-none transition-transform duration-1000 ease-in-out ${outerTransformClass}`}
+        className={`absolute ${finalTopClass} left-1/2 pointer-events-none transition-transform duration-1000 ease-in-out ${outerTransformClass}`}
         style={{ willChange: "transform" }}
       >
         {/* Green Outer Layer */}
@@ -123,7 +149,7 @@ export function HeroRadialLight() {
         ============================================================
       */}
       <div
-        className={`absolute top-[240px] sm:top-[280px] md:top-[320px] left-1/2 pointer-events-none transition-transform duration-1000 ease-in-out ${innerTransformClass}`}
+        className={`absolute ${finalTopClass} left-1/2 pointer-events-none transition-transform duration-1000 ease-in-out ${innerTransformClass}`}
         style={{ willChange: "transform" }}
       >
         {/* Green Inner Core */}

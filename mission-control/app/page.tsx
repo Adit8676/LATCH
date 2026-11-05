@@ -34,7 +34,7 @@ export default function Page() {
     }
   }, []);
 
-  if (loading && !isEmbed) return <div className={ui.empty}>Booting ./latch…</div>;
+  if (loading && !isEmbed) return <div className={ui.empty}>Booting latch.it…</div>;
   if (!user && !isEmbed) return <LoginGate />;
   return <Shell isEmbed={isEmbed} />;
 }

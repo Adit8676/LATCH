@@ -443,15 +443,18 @@ function ProjectDashboardContent() {
         <div className="flex flex-col gap-3 w-full">
           {/* Top Brand Header */}
           <div className="flex items-center justify-between px-3 pb-2 border-b border-sidebar-border">
-            <Link href="/" className="flex items-center gap-2 group min-w-0" title="Latch Mission Control">
+            <Link href="/" className="flex items-center gap-2 group min-w-0" title="latch.it Mission Control">
               <Image
                 src="/latch-logo.png"
-                alt="Latch"
-                width={105}
+                alt="latch.it"
+                width={110}
                 height={26}
-                className="h-6.5 w-auto object-contain dark:invert shrink-0 group-hover:opacity-85 transition-opacity"
+                className="h-6 w-auto object-contain dark:invert shrink-0 group-hover:opacity-85 transition-opacity"
                 priority
               />
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border hidden sm:inline">
+                v2.4
+              </span>
               <span className="text-[10px] font-mono text-muted-foreground block truncate border-l border-sidebar-border pl-2">
                 MC
               </span>

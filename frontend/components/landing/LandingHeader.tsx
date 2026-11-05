@@ -11,10 +11,10 @@ export function LandingHeader() {
     <header className="fixed top-0 left-0 right-0 z-40 bg-background/85 backdrop-blur-md border-b border-border transition-colors duration-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2 group" title="Latch">
+        <Link href="/" className="flex items-center gap-2.5 group" title="latch.it">
           <Image
             src="/latch-logo.png"
-            alt="Latch Logo"
+            alt="latch.it"
             width={120}
             height={28}
             className="h-7 sm:h-8 w-auto object-contain dark:invert group-hover:opacity-85 transition-opacity"

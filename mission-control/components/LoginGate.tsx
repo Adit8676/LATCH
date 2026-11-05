@@ -87,7 +87,10 @@ export function LoginGate() {
           </div>
 
           <div className="flex items-center justify-center gap-2.5">
-            <img src="/latch-logo.png" alt="Latch" className="h-8 sm:h-9 w-auto object-contain invert" />
+            <img src="/latch-logo.png" alt="latch.it" className="h-8 sm:h-9 w-auto object-contain invert" />
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 border border-neutral-700">
+              v2.4
+            </span>
             <span className="text-neutral-500 font-light text-2xl">/</span>
             <span className="text-xl sm:text-2xl font-bold font-[var(--font-display)] text-white">Studio</span>
           </div>

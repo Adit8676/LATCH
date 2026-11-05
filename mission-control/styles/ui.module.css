@@ -61,6 +61,17 @@
 :global([data-theme="light"]) .navBrandLogo {
   filter: invert(0);
 }
+.navBrandBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--elev);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  line-height: 1;
+  white-space: nowrap;
+}
 .navBrandText {
   font-family: var(--font-display);
   font-size: 16.5px;
@@ -2131,6 +2142,7 @@
   .navRight { gap: 10px; }
 }
 @media (max-width: 640px) {
+  .navBrandBadge { display: none; }
   .navBrandText { display: none; }
   .navSyncLabel { display: none; }
   .navSync { padding: 0 9px; }
