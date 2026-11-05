@@ -78,7 +78,7 @@ export const RenderService = {
     return false;
   },
 
-  async createService({ name, repo, branch = "main", region = "singapore", plan = "free" }) {
+  async createService({ name, repo, branch = "main", region = "singapore", plan = "free", environmentId = process.env.RENDER_ENVIRONMENT_ID }) {
     const args = [
       "services", "create",
       "--name", name,
@@ -88,9 +88,11 @@ export const RenderService = {
       "--branch", branch,
       "--region", region,
       "--plan", plan,
-      "-o", "json",
-      "--confirm",
     ];
+    if (environmentId) {
+      args.push("--environment-id", environmentId);
+    }
+    args.push("-o", "json", "--confirm");
     const output = await runCli(args);
     return JSON.parse(output);
   },
