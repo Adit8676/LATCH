@@ -9,7 +9,7 @@
     "test": "node ../tests/run.js mission-control"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
     "@xyflow/react": "^12.11.3",
     "esbuild": "^0.28.2",
     "lucide-react": "^1.64.0",
@@ -21,7 +21,8 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@types/node": "^20.19.43",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.13.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.0",
     "typescript": "^5.9.3"

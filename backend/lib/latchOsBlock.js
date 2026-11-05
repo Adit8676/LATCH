@@ -6,10 +6,6 @@
 const LATCH_OS_BEGIN = "<!-- BEGIN:latch-os -->";
 const LATCH_OS_END = "<!-- END:latch-os -->";
 
-// Keep legacy markers as well so old blocks can be cleanly replaced
-const RELAY_OS_BEGIN = "<!-- BEGIN:relay-os -->";
-const RELAY_OS_END = "<!-- END:relay-os -->";
-
 function latchOsBlock() {
   return `${LATCH_OS_BEGIN}
 # Latch (auto-installed)
@@ -49,10 +45,10 @@ When the user sends any of these phrases (with or without a leading \`/\`), trea
 
 | User says | You do |
 |-----------|--------|
-| \`/latch update\` or \`latch update\` (or \`/relay update\`) | \`latch sync .\` → \`latch compile .\` → read \`.latch/compile_brief.md\` → update \`.latch/project.md\`, \`current_task.md\`, \`decisions.md\`, \`failures.md\` → \`latch context .\` → confirm "Latch updated." |
-| \`/latch context\` or \`latch context\` (or \`/relay context\`) | Read \`.latch/latch_context.md\` (run \`latch context .\` first if stale). Summarize handoff briefly. |
-| \`/latch ask\` or \`latch ask\` (or \`/relay ask\`) | Call Latch MCP tool **\`latch_room_brief\`** (or \`relay_room_brief\`, MCP server **\`latch\`**). Required on **Cursor, Claude Code, Codex, Copilot CLI, and Antigravity** — not a terminal command for the human. Summarize teammate chat, code edits, locks, and file-sync notes. Tell the user before you edit shared files. If \`latch\` MCP is missing, say so and suggest \`latch add .\` + agent restart (do not ask the user to run \`latch ask\`). |
-| \`/latch init\` or \`latch init\` (or \`/relay init\`) | Run \`latch init\` in project root if \`.latch/\` missing; else confirm already installed. |
+| \`/latch update\` or \`latch update\` | \`latch sync .\` → \`latch compile .\` → read \`.latch/compile_brief.md\` → update \`.latch/project.md\`, \`current_task.md\`, \`decisions.md\`, \`failures.md\` → \`latch context .\` → confirm "Latch updated." |
+| \`/latch context\` or \`latch context\` | Read \`.latch/latch_context.md\` (run \`latch context .\` first if stale). Summarize handoff briefly. |
+| \`/latch ask\` or \`latch ask\` | Call Latch MCP tool **\`latch_room_brief\`** (MCP server **\`latch\`**). Required on **Cursor, Claude Code, Codex, Copilot CLI, and Antigravity** — not a terminal command for the human. Summarize teammate chat, code edits, locks, and file-sync notes. Tell the user before you edit shared files. If \`latch\` MCP is missing, say so and suggest \`latch add .\` + agent restart (do not ask the user to run \`latch ask\`). |
+| \`/latch init\` or \`latch init\` | Run \`latch init\` in project root if \`.latch/\` missing; else confirm already installed. |
 
 Use \`npx latch\` if the \`latch\` command is not on PATH. Do not ask the user to edit agent config files manually.
 
@@ -69,9 +65,9 @@ Project: \`${ws}\`
 
 ## /latch ask (all agents)
 
-When the user says **\`/latch ask\`** or **\`latch ask\`** (or **\`/relay ask\`**):
+When the user says **\`/latch ask\`** or **\`latch ask\`**:
 
-1. Call MCP tool **\`latch_room_brief\`** (or \`relay_room_brief\`) on the **\`latch\`** MCP server (stdio — installed by \`latch add\`).
+1. Call MCP tool **\`latch_room_brief\`** on the **\`latch\`** MCP server (stdio — installed by \`latch add\`).
 2. Summarize peer chat, code edits, live locks, and the file-sync note for the user.
 3. **Do not** tell the human to run a CLI command.
 
@@ -94,9 +90,6 @@ See the \`latch-os\` block in \`AGENTS.md\` / \`CLAUDE.md\` for \`/latch update\
 module.exports = {
   LATCH_OS_BEGIN,
   LATCH_OS_END,
-  RELAY_OS_BEGIN,
-  RELAY_OS_END,
   latchOsBlock,
-  relayOsBlock: latchOsBlock,
   agentBootstrap
 };

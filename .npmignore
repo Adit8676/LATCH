@@ -1,0 +1,35 @@
+# Git & CI
+.git/
+.github/
+
+# Development and testing
+tests/
+coverage/
+vitest.config.mjs
+
+# Internal documents and media
+PitchDeck.pdf
+screenRec.gif
+support_images/
+landing/
+serverboard/
+desktop/
+docs/
+extensions/
+
+# Environment files and logs
+.env
+.env.*
+*.log
+.DS_Store
+
+# Exclude all node_modules and tsbuildinfo
+**/node_modules/
+**/*.tsbuildinfo
+
+# Next.js build cache & dev artifacts (keep only production runtime: server/, static/, manifests, BUILD_ID)
+**/.next/cache/
+**/.next/dev/
+**/.next/diagnostics/
+**/.next/types/
+**/.next/**/*.map

@@ -8,7 +8,7 @@ const cmd = process.argv[2] || "help";
 const rest = process.argv.slice(3);
 
 function help() {
-  console.log(`Latch — GitHub Desktop for AI agents (alias: relay)
+  console.log(`Latch — GitHub Desktop for AI agents
 
   latch login              Sign in with GitHub (uses gh CLI, or device flow if GITHUB_CLIENT_ID is set)
   latch logout             Clear the local session
@@ -46,7 +46,7 @@ function killTree(child) {
 function apiPort(args) {
   const idx = args.indexOf("--port");
   if (idx >= 0) return Number(args[idx + 1]);
-  return Number(process.env.LATCH_PORT || process.env.RELAY_PORT || 3001);
+  return Number(process.env.LATCH_PORT || 3001);
 }
 
 async function waitForApi(url, ms = 30000) {
@@ -66,7 +66,7 @@ async function waitForApi(url, ms = 30000) {
 async function serve(args) {
   const noUi = args.includes("--no-ui");
   const forwarded = args.filter((a) => a !== "--no-ui");
-  const uiPort = process.env.LATCH_UI_PORT || process.env.RELAY_UI_PORT || "3002";
+  const uiPort = process.env.LATCH_UI_PORT || "3002";
   const port = apiPort(forwarded);
   const apiOrigin = `http://127.0.0.1:${port}`;
   const children = [];
@@ -79,8 +79,7 @@ async function serve(args) {
     env: {
       ...process.env,
       LATCH_PORT: String(port),
-      RELAY_PORT: String(port),
-      LATCH_UI_ORIGIN: process.env.LATCH_UI_ORIGIN || process.env.RELAY_UI_ORIGIN || `http://localhost:${uiPort}`,
+      LATCH_UI_ORIGIN: process.env.LATCH_UI_ORIGIN || `http://localhost:${uiPort}`,
     },
   });
   children.push(api);
@@ -99,8 +98,25 @@ async function serve(args) {
   });
 
   if (!noUi) {
-    const nextBin = path.join(root, "node_modules", "next", "dist", "bin", "next");
-    if (!fs.existsSync(nextBin)) {
+    function findNextBin() {
+      const candidates = [
+        path.join(root, "node_modules", "next", "dist", "bin", "next"),
+        path.join(root, "mission-control", "node_modules", "next", "dist", "bin", "next"),
+      ];
+      for (const c of candidates) {
+        if (fs.existsSync(c)) return c;
+      }
+      try {
+        const resolved = require.resolve("next/dist/bin/next", {
+          paths: [root, path.join(root, "mission-control")],
+        });
+        if (fs.existsSync(resolved)) return resolved;
+      } catch {}
+      return null;
+    }
+
+    const nextBin = findNextBin();
+    if (!nextBin) {
       console.error("Mission Control is not installed — run npm install");
       shutdown(1);
       return;
@@ -111,7 +127,9 @@ async function serve(args) {
       shutdown(1);
       return;
     }
-    const ui = spawn(process.execPath, [nextBin, "dev", "--port", String(uiPort)], {
+    const isProduction = fs.existsSync(path.join(root, "mission-control", ".next", "BUILD_ID"));
+    const nextSubcommand = isProduction ? "start" : "dev";
+    const ui = spawn(process.execPath, [nextBin, nextSubcommand, "--port", String(uiPort)], {
       stdio: "inherit",
       cwd: path.join(root, "mission-control"),
       windowsHide: false,
@@ -119,7 +137,6 @@ async function serve(args) {
       env: {
         ...process.env,
         NEXT_PUBLIC_LATCH_API: apiOrigin,
-        NEXT_PUBLIC_RELAY_API: apiOrigin,
       },
     });
     children.push(ui);
@@ -178,7 +195,7 @@ async function doctor() {
     const hit = async (p) => {
       const r = await fetch(`${String(room.url).replace(/\/$/, "")}${p}`, {
         headers: {
-          "ngrok-skip-browser-warning": "relay",
+          "ngrok-skip-browser-warning": "true",
           ...(token ? { "x-latch-room-token": token } : {}),
         },
         signal: AbortSignal.timeout(6000),
@@ -372,7 +389,7 @@ async function main() {
           type: "http",
           url: `${String(room.url).replace(/\/$/, "")}/mcp`,
           headers: {
-            "ngrok-skip-browser-warning": "relay",
+            "ngrok-skip-browser-warning": "true",
             ...(room.memberToken ? { "x-latch-room-token": room.memberToken } : {}),
           },
         },

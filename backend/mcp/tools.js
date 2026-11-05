@@ -10,7 +10,7 @@ const path = require('path');
  * "a room member asking through the tunnel" without either transport growing
  * its own copy of the logic.
  *
- * When the user says `/relay ask`, agents call `relay_room_brief` here — not a CLI command.
+ * When the user says `/latch ask`, agents call `latch_room_brief` here — not a CLI command.
  */
 const client = require("../coordinator/client");
 const { loadMemory, loadRegistry } = require("../lib/store");
@@ -73,13 +73,7 @@ const LATCH_TOOLS = [
   },
 ];
 
-// Add relay_* legacy aliases so any cached agent schema continues to resolve
-const RELAY_ALIASES = LATCH_TOOLS.map(t => ({
-  ...t,
-  name: t.name.replace(/^latch_/, "relay_")
-}));
-
-const TOOLS = [...LATCH_TOOLS, ...RELAY_ALIASES];
+const TOOLS = [...LATCH_TOOLS];
 
 /**
  * What a caller reached through the tunnel is allowed to do.
@@ -94,15 +88,6 @@ const READ_ONLY = new Set([
   "latch_get_conflicts",
   "latch_room_brief",
   "latch_get_collision_stats",
-  "relay_get_chat_history",
-  "relay_status",
-  "relay_get_project_context",
-  "relay_get_recent_changes",
-  "relay_get_decisions",
-  "relay_get_active_tasks",
-  "relay_get_conflicts",
-  "relay_room_brief",
-  "relay_get_collision_stats",
 ]);
 
 function toolsFor(ctx) {
@@ -112,7 +97,7 @@ function toolsFor(ctx) {
 function resolveProjectId(workspace) {
   const reg = loadRegistry();
   return (
-    process.env.RELAY_PROJECT_ID ||
+    process.env.LATCH_PROJECT_ID ||
     reg.projects.find((p) => p.path === workspace)?.id ||
     reg.projects[0]?.id
   );
@@ -120,7 +105,7 @@ function resolveProjectId(workspace) {
 
 /** The context a stdio server runs with: this machine, full access. */
 function defaultCtx(overrides = {}) {
-  let workspace = process.env.RELAY_WORKSPACE_PATH || process.env.LATCH_WORKSPACE_PATH;
+  let workspace = process.env.LATCH_WORKSPACE_PATH;
   const cwd = process.cwd();
   if (!workspace) {
     try {
@@ -140,10 +125,10 @@ function defaultCtx(overrides = {}) {
   return {
     workspace,
     projectId: resolveProjectId(workspace),
-    agentId: process.env.RELAY_AGENT_ID || `mcp:${os.hostname()}:${process.pid}`,
-    user: process.env.RELAY_USER || "local",
-    owner: process.env.RELAY_OWNER || "local",
-    centralProjectId: process.env.RELAY_CENTRAL_PROJECT_ID || null,
+    agentId: process.env.LATCH_AGENT_ID || `mcp:${os.hostname()}:${process.pid}`,
+    user: process.env.LATCH_USER || "local",
+    owner: process.env.LATCH_OWNER || "local",
+    centralProjectId: process.env.LATCH_CENTRAL_PROJECT_ID || null,
     readOnly: false,
     viewer: null,
     ...overrides,
@@ -204,8 +189,8 @@ async function fetchHostState(room) {
   const res = await fetch(`${base}/api/room/state${query}`, {
     signal: AbortSignal.timeout(HOST_TIMEOUT_MS),
     headers: {
-      "ngrok-skip-browser-warning": "relay",
-      ...(room.memberToken ? { "x-relay-room-token": room.memberToken } : {}),
+      "ngrok-skip-browser-warning": "true",
+      ...(room.memberToken ? { "x-latch-room-token": room.memberToken } : {}),
     },
   });
   if (!res.ok) throw new Error(`room/state ${res.status}`);
@@ -267,10 +252,9 @@ function withCtx(context = {}) {
   return { ...defaultCtx(), ...supplied };
 }
 
-async function callTool(rawName, args = {}, context = {}) {
-  const name = String(rawName || "").replace(/^relay_/, "latch_");
+async function callTool(name, args = {}, context = {}) {
   const ctx = withCtx(context);
-  if (ctx.readOnly && !READ_ONLY.has(name) && !READ_ONLY.has(rawName)) {
+  if (ctx.readOnly && !READ_ONLY.has(name)) {
     throw new Error(`${name} is not available to remote callers - run it against your own latch.`);
   }
   const pid = ctx.projectId;
