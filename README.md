@@ -1,249 +1,491 @@
-<div align="center">
+# Latch (`latch.it`)
 
-![Latch](./logo.png)
+> **The coordination layer for machine-speed coders.**  
+> Prevent concurrent agent clobbers, bound AST blast radiuses, and synchronize distributed AI coding swarms in real time.
 
-### GitHub Desktop for AI agents.
+---
 
-*Git coordinates humans committing minutes apart. **Latch coordinates agents editing the same files right now** — file locks, dependency-aware locks, live patch sync, and one shared board.*
+## Table of Contents
 
-**Twelve agents on one repo, and none of them blind to the others.**
+- [Overview](#overview)
+- [The Problem: Why Autonomous Agent Swarms Break](#the-problem-why-autonomous-agent-swarms-break)
+- [How Latch Works](#how-latch-works)
+  - [1. Sub-Millisecond Exclusive File Mutex Leases](#1-sub-millisecond-exclusive-file-mutex-leases)
+  - [2. AST Dependency Blast-Radius Bounding](#2-ast-dependency-blast-radius-bounding)
+  - [3. Non-Invasive Stop Hook Interception](#3-non-invasive-stop-hook-interception)
+  - [4. Host–Guest Room Topology](#4-hostguest-room-topology)
+  - [5. Causal Working-Tree Patch Sync](#5-causal-working-tree-patch-sync)
+  - [6. Shared Memory & MCP Context Engine](#6-shared-memory--mcp-context-engine)
+- [Installation](#installation)
+  - [System Requirements](#system-requirements)
+  - [Installing the CLI](#installing-the-cli)
+- [Quickstart: Getting Started in 3 Minutes](#quickstart-getting-started-in-3-minutes)
+  - [Mode A: Room Host (Starting a Swarm)](#mode-a-room-host-starting-a-swarm)
+  - [Mode B: Teammate / Guest (Joining a Swarm)](#mode-b-teammate--guest-joining-a-swarm)
+  - [Testing Your First Coordinated Write](#testing-your-first-coordinated-write)
+- [Supported Agents & Hook Protocol](#supported-agents--hook-protocol)
+- [CLI Reference](#cli-reference)
+  - [Identity Commands](#identity-commands)
+  - [Workspace Management](#workspace-management)
+  - [Daemon & Server](#daemon--server)
+  - [Causal Patch Sync](#causal-patch-sync)
+  - [Diagnostics & MCP](#diagnostics--mcp)
+- [Using Mission Control Dashboard](#using-mission-control-dashboard)
+- [Using the MCP Context Server](#using-the-mcp-context-server)
+- [Configuration & Environment Variables](#configuration--environment-variables)
+- [Troubleshooting & Diagnostics](#troubleshooting--diagnostics)
+- [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
 
-[**Watch the demo**](https://youtu.be/vUea5Qih-nM) · [**Read the Documentation**](https://latch-brain.vercel.app/docs.html) · [**Docs in this repo**](./docs/README.md)
+---
 
-<br/>
+## Overview
 
-<a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%E2%89%A520-3c873a?style=for-the-badge&logo=node.js&logoColor=white" alt="Node 20+"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2563eb?style=for-the-badge" alt="MIT"></a>
-<img src="https://img.shields.io/badge/storage-files%20only-64748b?style=for-the-badge" alt="No database">
-<img src="https://img.shields.io/badge/login-not%20required-16a34a?style=for-the-badge" alt="No login">
+AI coding agents (Claude Code, Cursor, Copilot Workspace, Codex, and Antigravity) write code at machine speed. When multiple agents or developers edit the same codebase simultaneously, they have **zero awareness of each other**. They overwrite concurrent work, break downstream interfaces, and cause catastrophic git merge conflicts.
 
-<br/>
-<br/>
+**Latch** sits between your AI coding agents and your local filesystem. It wraps your workspace in an atomic lock arbiter, tracks module blast radiuses using concrete AST parsing, and streams working-tree patches across machines before code ever hits git.
 
-**Works with**
+```
+       WITHOUT LATCH                               WITH LATCH
+ 12 Agents · Blind Writers             12 Agents · 1 Coordination Bus
+Conflicts discovered at merge         Conflicts prevented before write lands
 
-<p align="center">
-  <img src="./support_images/readme/cursor.png" alt="Cursor" height="46" />
-  <img src="./support_images/readme/claude.png" alt="Claude Code" height="46" />
-  <img src="./support_images/readme/copilot.png" alt="GitHub Copilot" height="46" />
-  <br />
-  <img src="./support_images/readme/codex.png" alt="Codex" height="46" />
-  <img src="./support_images/readme/antigravity.png" alt="Google Antigravity" height="46" />
-</p>
-
-</div>
-
-## The problem
-
-Eighteen months ago you had **one** coding assistant. Today you probably have **three running at once** — Claude in one terminal, Cursor in another, Copilot in the editor. They all write to the same files, and not one of them knows the others exist.
-
-Now put **four people** on that repo. That's **twelve agents**, editing the same code, blind to each other. You find out at the merge. Or you don't find out at all.
-
-Git solved this for humans — but Git assumes people committing at human speed, minutes apart, one branch each. **Agents write at machine speed, in parallel, in the same directory.** There is no layer for that.
-
-## The fix
-
-```diff
-- 12 agents · 12 blind writers · conflicts discovered at merge
-+ 12 agents · 1 lock table · conflicts prevented at the edit
+   Agent A ──┐ (blind edit)               Agent A ──┐
+             ├──► File Overwrite                    ├──► [ LATCH ARBITER ]
+   Agent B ──┘ (silent clobber)           Agent B ──┘    ├── AST Guard
+                                                         ├── Mutex Lease
+                                                         └── Patch Sync
 ```
 
-Latch sits under every agent as a **coordination layer**. Pre-tool hooks claim a lock before an agent writes; post-tool hooks release it. If one agent is modifying a component, another **cannot silently overwrite** those changes.
+---
 
-> **One host, no backend.** One person runs `latch serve` — that machine *is* the server. Everyone else connects over an ngrok tunnel, straight to that laptop. Nothing lives on infrastructure you do not own.
+## The Problem: Why Autonomous Agent Swarms Break
 
-<div align="center">
+Git was designed for human developers committing minutes or hours apart. AI agents work in seconds:
 
-![Latch Demo](./screenRec.gif)
+1. **No Filesystem Mutexes**: Multiple agents write to the same files concurrently without file lock arbitration, clobbering each other's edits mid-stream.
+2. **Hidden AST Blast Radiuses**: An agent modifying an authentication signature in `auth.ts` doesn't know that another agent is simultaneously updating `routes.ts` which depends on that signature.
+3. **Drift Across Machines**: When teammates run parallel agents on separate laptops, their uncommitted working trees diverge rapidly, leading to merge hell.
+4. **Agent Hallucinations from Dirty State**: When an agent reads half-written or clobbered files, its context window ingests corrupted state and generates invalid code.
 
-**[Watch the full demo on YouTube](https://youtu.be/vUea5Qih-nM)**
+---
 
-</div>
+## How Latch Works
 
-## The four pillars
+Latch operates purely on your local machine and peer-to-peer over tunnels. It requires no centralized database, cloud backend, or third-party servers.
 
-| | What it does |
-|---|---|
-| **File locking** | Every agent write goes through a claim/release cycle against a shared lock table (TTL-based, auto-expiring). Destructive overwrites are blocked, not detected after the fact. |
-| **Dependency-graph locking** | Files do not exist independently — one change can affect dozens. Latch parses imports with tree-sitter and asks *"does this change affect files another agent is working on?"*, not just *"is this exact file locked?"* Agents stay parallel; the blast radius stays safe. |
-| **Patch sync across machines** | Your teammate has their own filesystem, environment, and agents. Latch propagates **patches**, not whole-project copies — `latch push` / `latch pull` keep every clone on the same working state. |
-| **Mission Control** | One board for every agent on every machine: live lock table, lock graph, code edits, unified agent chat history, conflicts, presence. |
+```
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                           LATCH LOCAL DAEMON                           │
+  │                             ( Web Socket )                             │
+  │                                                                        │
+  │   ┌─────────────────────┐   ┌──────────────────┐   ┌───────────────┐   │
+  │   │  TTL Mutex Engine   │   │ AST Blast Radius │   │  Vector Clock │   │
+  │   │  (Atomic Leases)    │   │  (Tree-sitter)   │   │   Patch Bus   │   │
+  │   └──────────▲──────────┘   └────────▲─────────┘   └───────▲───────┘   │
+  └──────────────┼───────────────────────┼─────────────────────┼───────────┘
+                 │ (Pre-tool claim)      │ (Import scan)       │ (Post-tool)
+  ┌──────────────┴───────────────────────┴─────────────────────┴───────────┐
+  │                            AGENT ECOSYSTEM                             │
+  │  Claude Code CLI  │  Cursor IDE  │  Copilot  │  Codex  │  Antigravity   │
+  └────────────────────────────────────────────────────────────────────────┘
+```
 
-## Quick start
+### 1. Sub-Millisecond Exclusive File Mutex Leases
+Whenever an agent invokes a file modification tool (`Write`, `Edit`, `apply_patch`), Latch intercepts the intent via a pre-tool hook.
+- If the file is **unlocked**, Latch grants an exclusive lease and assigns a time-to-live (TTL, default 30s) renewed by periodic heartbeats.
+- If another agent or user holds the lock, the write is **instantly rejected** before touching disk, reporting the exact holder identity.
+- When an agent finishes or crashes, the lease expires cleanly, preventing permanent deadlocks.
 
-**Host** — the machine everyone else connects to:
+### 2. AST Dependency Blast-Radius Bounding
+Path-exact locking is not enough. Modifying a shared interface breaks all files that import it. Latch parses the codebase using **Tree-sitter** grammar parsers across:
+- **TypeScript & JavaScript** (ESM & CommonJS imports)
+- **Rust, Go, C, & C++**
+- **Python, PHP, & Ruby**
+- **Java & C#**
+
+When Agent A claims `src/auth/session.ts`, Latch calculates its downstream dependent graph (e.g., `src/api/routes.ts`, `src/middleware/auth.ts`). If Agent B tries to touch any file within that blast radius, Latch rejects the write with an AST boundary collision notice.
+
+### 3. Non-Invasive Stop Hook Interception
+Latch does not require modifying agent binaries or installing proprietary editor plugins. It configures the standard native hook protocols of each supported agent:
+- Pre-tool hook: claims mutex and validates blast radius.
+- Post-tool hook: releases mutex and broadcasts the patch.
+- Pre-read hook: ensures clean, synchronized state before an agent reads files.
+- Stop hook: gracefully clears leases when an agent session ends.
+
+### 4. Host–Guest Room Topology
+- **Host**: Exactly one machine per team workspace runs `latch serve`. It owns the canonical lock table.
+- **Guest**: Teammates run their own local Latch daemon. When they connect to a host room via an ngrok tunnel, lock requests are verified across the tunnel while keeping disk operations strictly local.
+
+### 5. Causal Working-Tree Patch Sync
+Latch does not push or pull git commits. It synchronizes the **dirty working tree** across team members using reverse unified diffs:
+- `latch push`: Bundles dirty working-tree edits and broadcasts them to the room.
+- `latch pull`: Applies remote working-tree changes without requiring git commit or branch switching.
+
+### 6. Shared Memory & MCP Context Engine
+Latch runs a Model Context Protocol (MCP) server. Connected agents share:
+- Live lock tables and conflict alerts.
+- Cross-agent unified transcript history.
+- Shared architectural decisions and active task tracking.
+
+---
+
+## Installation
+
+### System Requirements
+| Component | Requirement | Notes |
+| :--- | :--- | :--- |
+| **Node.js** | Node.js 18+ (20+ recommended) | Runs the daemon and CLI |
+| **npm** | npm 9+ | CLI package management |
+| **Git** | Any modern version | Required for `latch clone` |
+| **GitHub CLI** | `gh` CLI (Optional) | Simplifies zero-config authentication |
+| **ngrok** | Optional | Only needed for cross-machine room sharing |
+| **Database** | **None** | No PostgreSQL, Redis, or cloud DB required |
+
+### Installing the CLI
 
 ```bash
-latch login              # GitHub identity (uses the gh CLI)
-latch clone <repo-url>   # clone + register workspace + install agent hooks
-latch serve              # API → 127.0.0.1:3001 · Mission Control → :3002
+# 1. Install the latch cli 
+npm i -g latch-it
+
+# 2. Check whether it is installed 
+latch --version 
+
+#3. login using your github
+latch login  #follow the prompts 
+
+#4. Add the mcp and instructions file 
+latch add . 
+latch init
+
+#5 Start the server 
+latch serve
+
+#6 Push and pull the changes from the server
+latch clone 
+latch pull 
+latch push 
+
 ```
 
-Then open Mission Control → **Team → Share** to mint the ngrok invite link.
+---
 
-**Teammate:**
+## Quickstart: Getting Started in 3 Minutes
+
+### Mode A: Room Host (Starting a Swarm)
+
+Follow these 4 steps on the host machine:
+
+#### Step 1: Sign In with GitHub
+```bash
+latch login
+```
+*Locks will be attributed to your GitHub handle (e.g., `@developer`) so team members know who holds each file.*
+
+#### Step 2: Register a Repository
+If cloning a new repository:
+```bash
+latch clone https://github.com/your-org/your-repo.git
+cd your-repo
+```
+If you already have the repository on your disk:
+```bash
+latch add /path/to/existing-repo
+cd /path/to/existing-repo
+```
+*This registers the repository and writes hook configurations for Claude Code, Cursor, Copilot, Codex, and Antigravity automatically.*
+
+#### Step 3: Start the Coordination Daemon
+```bash
+latch serve
+```
+*Starts the local API daemon on `http://127.0.0.1:3001` and opens Mission Control on `http://localhost:3002`.*
+
+#### Step 4: Share the Room
+In Mission Control (`http://localhost:3002`), navigate to **Team → Share**. Latch generates an encrypted invite link with an embedded room token to share with teammates.
+
+---
+
+### Mode B: Teammate / Guest (Joining a Swarm)
+
+Teammates keep their own files and run their own agents locally:
 
 ```bash
-latch serve              # their own local latch
-# join with the host's invite link on the Team tab
-latch pull               # take the host's current working state
+# 1. Authenticate identity
+latch login
+
+# 2. Clone the repository locally
+latch clone https://github.com/your-org/your-repo.git
+cd your-repo
+
+# 3. Start your local Latch daemon
+latch serve
+
+# 4. Connect to the host's room
+# In Mission Control (http://localhost:3002) → Team → Join → Paste host invite link
+
+# 5. Pull the host's live uncommitted state
+latch pull
 ```
 
-Now start agents as usual. Hooks claim and release locks automatically — nobody has to remember a command.
+---
 
-<details>
-<summary><strong>Install options</strong></summary>
+### Testing Your First Coordinated Write
 
-<br/>
+1. Open your terminal or IDE agent (e.g. Claude Code or Cursor).
+2. Prompt the agent to refactor a file (e.g. `src/auth.ts`).
+3. Check the active locks in another terminal:
+   ```bash
+   latch status
+   ```
+4. Observe that the lock table lists `src/auth.ts` as exclusively held by your agent.
+5. If a second agent attempts to edit `src/auth.ts` concurrently, Latch refuses the write with:
+   ```text
+   [Latch Error] Lock rejected: src/auth.ts is currently held by @developer (agent: claude).
+   Lease expires in 18s.
+   ```
 
-| Method | Command |
-|--------|---------|
-| local dev | `npm i`, then `npm link` in this repo |
-| attach an existing repo | `latch add /path/to/repo` |
-| fresh clone | `latch clone <url> [dir]` |
+---
 
-Requires **Node.js 18+** (20+ recommended). No database, no hosted backend, no login server.
+## Supported Agents & Hook Protocol
 
-</details>
+Latch hooks into agents at the config layer. When you run `latch clone` or `latch add`, the following hook files are created:
 
-## How it works
+| Agent | Config File | Intercepted Tools |
+| :--- | :--- | :--- |
+| **Claude Code** | `.claude/settings.json` | `Edit`, `Write`, `NotebookEdit` |
+| **Cursor IDE** | `.cursor/hooks.json` | `Write`, `Edit`, `Delete` |
+| **Codex** | `.codex/hooks.json` | `apply_patch`, `Edit`, `Write` |
+| **GitHub Copilot CLI** | `.github/hooks/latch-os.json` | `edit`, `create` |
+| **Antigravity** | `.agents/hooks.json` | `write_to_file`, `replace_file_content`, `multi_replace_file_content` |
 
-```text
-  Cursor ──┐  pre-tool hook: claim
-  Claude ──┤  post-tool hook: release      ┌──────────────┐
-  Copilot ─┼──► lock table ◄── dep graph ──│ latch serve  │──► Mission Control
-  Codex ───┤        ▲                      │  (your host) │          ▲
-  Antigravity ┘     │                      └──────┬───────┘          │
-                    │       ngrok tunnel          │                  │
-              teammate's latch ◄──── patches ─────┴──────────────────┘
-```
+Hook files can be safely committed to source control so every contributor inherits the coordination layer automatically.
 
-| Layer | Who runs it | What it guards |
-|-------|-------------|----------------|
-| **Claim / release** | pre- and post-tool hooks | exclusive write access to a file |
-| **Dependency graph** | tree-sitter import scan | files *affected by* the edit, not just the edit |
-| **Room** | `latch serve` + ngrok tunnel | one shared lock table across machines |
-| **Patches** | `latch push` / `latch pull` | working-tree state without full copies |
-| **Board** | Mission Control (:3002) | who holds what, right now |
+---
 
-> Locks and the board are separate subsystems — hooks arbitrate straight against the host, while the board is fed by a mirror. `latch doctor` walks that chain and tells you which link is broken.
+## CLI Reference
 
-## Commands
+### Identity Commands
 
-| Command | Description |
-|---------|-------------|
-| `latch login` / `logout` / `whoami` | GitHub identity (via `gh` CLI, or device flow with `GITHUB_CLIENT_ID`) |
-| `latch clone <url> [dir]` | git clone + register workspace + install agent hooks |
-| `latch add <path>` | Attach an existing local repo |
-| `latch init [path]` | Wire hooks, Latch MCP, and `/latch ask` instructions for all agents |
-| `latch serve` | API on `127.0.0.1:3001` + Mission Control on `:3002` |
-| `latch serve --no-ui` | API + coordinator only |
-| `latch push` | Send your dirty working-tree files to the shared room |
-| `latch pull` | Apply the host's current dirty files onto this clone |
-| `latch status` | Health check (room, role, host, ports) |
-| `latch mcp-url` | Print the MCP config for this room's shared-context endpoint |
-| `latch doctor` | Diagnose an empty Coordinator board |
-
-## Mission Control
-
-Started by `latch serve` — runs on your own machine, no hosted account.
-
-| | URL |
-|---|-----|
-| Dashboard | http://localhost:3002 |
-| API | http://127.0.0.1:3001/api/health |
-
-**Collisions prevented counter** (persisted to `~/.latch/data/projects/<id>/collisions.json` and mirrored to `<repo>/.latch/collisions.json`).
-
-## MCP — shared room context
-
-Any MCP client can read the room's context, **even on a machine with no latch installed**:
-
+#### `latch login`
+Sign in with your GitHub identity. Uses your existing `gh` CLI credentials, or falls back to device flow if `GITHUB_CLIENT_ID` is set.
 ```bash
-latch mcp-url    # prints a ready-to-paste mcpServers block
+latch login
 ```
 
-Coordination tools (`latch_claim_file`, `latch_release_file`, `latch_status`) run against each member's own local latch. The room endpoint is **read-only** for anyone off the host machine.
+#### `latch whoami`
+Displays the currently signed-in GitHub username and active project id.
+```bash
+latch whoami
+```
 
-<details>
-<summary><strong>Tools exposed</strong></summary>
+#### `latch logout`
+Clears local session tokens without affecting your underlying `gh` CLI setup.
+```bash
+latch logout
+```
 
-<br/>
+---
 
-| Tool | Purpose |
-|------|---------|
-| `latch_claim_file` | Acquire an exclusive write lock before editing |
-| `latch_release_file` | Release the lock after editing |
-| `latch_status` | View the full lock table |
-| `latch_get_conflicts` | Overlapping edits in the last 5 minutes |
-| `latch_get_recent_changes` | Recent `code_edit` events |
-| `latch_get_chat_history` | Unified agent chat across every room member |
-| `latch_room_brief` | Teammate activity brief (for the `/latch ask` agent pseudo-command) |
-| `latch_get_collision_stats` | Lifetime counters for collisions Latch prevented |
-| `latch_report_change` | Push a code-change event |
-| `latch_report_decision` / `latch_get_decisions` | Append / read decisions |
-| `latch_update_task` / `latch_get_active_tasks` | Append / read tasks |
-| `latch_get_project_context` | Full JSON project context |
-| `latch_sync` | Re-read agent transcripts into unified history |
+### Workspace Management
 
-</details>
+#### `latch clone <url> [dir]`
+Performs a `git clone`, registers the workspace with Latch, and installs agent hooks in a single command.
+```bash
+latch clone https://github.com/org/repo.git ./my-repo
+```
 
-## Hooks
+#### `latch add <path>`
+Registers an existing local folder as a Latch workspace and installs agent hooks without touching git history.
+```bash
+latch add ~/projects/my-app
+```
 
-`latch clone` / `latch add` / `latch init` install pre-tool (**claim**), post-tool (**release**), pre-read, stop hooks, **Latch MCP** (`latch_room_brief` for `/latch ask`), and the latch-os instruction block into every agent surface:
+---
 
-| Agent | Hooks | Instructions | Latch MCP (`latch_room_brief`) |
-|-------|--------|--------------|--------------------------------|
-| Claude Code | `.claude/settings.json` | `CLAUDE.md` | `.claude/settings.json` → `mcpServers.latch` |
-| Cursor | `.cursor/hooks.json` | `.cursor/rules/latch.mdc`, `AGENTS.md` | `.cursor/mcp.json` |
-| Codex | `.codex/hooks.json` | `AGENTS.md` | `.codex/config.toml` → `[mcp_servers.latch]` |
-| Copilot CLI | `.github/hooks/latch-os.json` | `.github/copilot-instructions.md` | `.github/mcp.json` |
-| Antigravity | `.agents/hooks.json` | `AGENTS.md` | `.agents/mcp_config.json` |
+### Daemon & Server
 
-Languages parsed for the dependency graph: TypeScript/JavaScript, Python, Go, Rust, Java, C#, C/C++, PHP, Ruby.
+#### `latch serve`
+Boots the background API daemon and Mission Control dashboard.
+```bash
+latch serve              # API on :3001, Mission Control on :3002
+latch serve --no-ui      # Headless mode: API daemon only
+latch serve --port 4001  # Custom daemon port
+```
 
-## Dependencies
+#### `latch status`
+Health check printing daemon connectivity, room role (`host` or `guest`), and port status as JSON.
+```bash
+latch status
+```
 
-| | |
-|---|---|
-| **Required** | Node.js 18+ (20+ recommended), npm |
-| **Bundled** | `express`, `cors`, `ws`, `@vscode/tree-sitter-wasm` · `next`, `react` (Mission Control) |
-| **Not needed** | MongoDB, Redis, Docker, a hosted backend, an account |
-| **Optional** | `gh` CLI for `latch login` · ngrok for cross-machine rooms |
+---
 
-**Env vars:** `LATCH_PORT` (3001) · `LATCH_UI_PORT` (3002) · `LATCH_UI_ORIGIN`
+### Causal Patch Sync
 
-## Documentation
+#### `latch push`
+Bundles all uncommitted working-tree modifications and broadcasts them to the active room.
+```bash
+latch push
+```
 
-Full documentation lives in [`docs/`](./docs/README.md).
+#### `latch pull`
+Pulls and applies the latest uncommitted working-tree changes broadcast by the room host onto your local workspace.
+```bash
+latch pull
+```
 
-| | |
-|---|---|
-| [Quickstart](./docs/QUICKSTART.md) | Coordinating in about five minutes |
-| [Installation](./docs/INSTALLATION.md) | Requirements, install methods, what gets written where |
-| [Concepts](./docs/CONCEPTS.md) | Workspace, project, agent ID, lock, room, patch |
-| [Rooms and teams](./docs/ROOMS.md) | Hosting, invites, member tokens, joining, leaving |
-| [Architecture](./docs/ARCHITECTURE.md) | Process model, the two planes, one edit end to end |
-| [Locking](./docs/LOCKING.md) | The lock table, TTLs, ownership, dependency-graph soft locks |
-| [Sync and patches](./docs/SYNC.md) | Patch format, Lamport ordering, transform, transcripts |
-| [CLI reference](./docs/CLI.md) | Every command, flag and exit code |
-| [HTTP API reference](./docs/HTTP-API.md) | Every endpoint, with auth rules |
-| [MCP reference](./docs/MCP.md) | The fifteen tools and the read-only room endpoint |
-| [Hooks reference](./docs/HOOKS.md) | The hook contract per agent |
-| [Configuration](./docs/CONFIGURATION.md) | Environment variables, ports, on-disk layout |
-| [Troubleshooting](./docs/TROUBLESHOOTING.md) | `latch doctor` and the known failure modes |
+---
 
-## Roadmap
+### Diagnostics & MCP
 
-- **Git worktree isolation** — every agent in its own workspace off the same repository, free to experiment and test independently, integrated back into main when the work is ready.
-- Richer conflict resolution on top of the existing OT / patch layer.
+#### `latch doctor`
+Diagnoses room connectivity, daemon health, hook registrations, and lock table mirrors.
+```bash
+latch doctor
+```
 
-<div align="center">
+#### `latch mcp-url`
+Outputs ready-to-paste JSON configuration for connecting MCP-compatible tools to the room's live context server.
+```bash
+latch mcp-url
+```
 
-**We used Latch to build Latch.** The problem we were solving was the problem we were having.
+---
 
-The next time you build a hackathon project, do not just add more agents. **Just latch.it**
+## Using Mission Control Dashboard
 
-<sub>MIT licensed · Your machine is the server.</sub>
+When running `latch serve`, open **`http://localhost:3002`** to access Mission Control:
 
-</div>
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  ☰ [Flower Icon] latch.it v2.4       ● Daemon :3001     [+ New Project]│
+├────────────────────────────────────────────────────────────────────────┤
+│  All Projects                                                          │
+│  [ Filter projects...                       ]  [ Status: All ▾ ]       │
+├────────────────────────────────────────────────────────────────────────┤
+│  ▼ Active Workspaces (3 Active)                                        │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │ [Git] backend-api  ● ACTIVE SWARM          4 Coders  :3001 Live  │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│  ▼ Failed / Blocked Workspaces (1 Blocked)                             │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │ [X] auth-service   ● FAILED / BLOCKED      Conflict  :3001 Live  │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+- **Lock Leases Table**: Real-time table of all active file locks, owning agent, and countdown TTL timer.
+- **AST Blast-Radius Visualizer**: Interactive module boundary graph showing which downstream files are protected.
+- **Causal Event Stream**: Real-time chronological audit log of file claims, releases, and patch broadcasts.
+- **Unified Agent Chat**: Aggregated transcript history across all agents running on any connected machine.
+- **Room Sharing & Presence**: Invite links, member tokens, and peer latency status.
+
+---
+
+## Using the MCP Context Server
+
+Any MCP-compatible client (Claude Desktop, Cursor, Antigravity, OpenCode) can connect to Latch to query lock state, read transcripts, or append decisions.
+
+### 1. Retrieve Configuration
+Run inside your workspace:
+```bash
+latch mcp-url
+```
+
+### 2. Configure Your MCP Client
+Add the emitted config to your agent's MCP settings (e.g. `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "latch-room": {
+      "type": "http",
+      "url": "https://<your-ngrok-tunnel>.ngrok-free.app/mcp",
+      "headers": {
+        "ngrok-skip-browser-warning": "latch",
+        "x-latch-room-token": "rmt_your_room_token"
+      }
+    }
+  }
+}
+```
+
+### 3. Exposed MCP Tools
+- `latch_claim_file`: Acquire an exclusive lock on a file before editing.
+- `latch_release_file`: Release a held lock after completing an edit.
+- `latch_status`: Inspect all active locks and blast radiuses across the room.
+- `latch_get_conflicts`: Query contested edits or AST collisions in the last 5 minutes.
+- `latch_get_recent_changes`: Retrieve real-time `code_edit` event stream.
+- `latch_report_decision` / `latch_get_decisions`: Coordinate architecture choices across swarms.
+- `latch_update_task` / `latch_get_active_tasks`: Synchronize swarm task backlog.
+- `latch_get_chat_history`: Access unified transcripts from other connected agents.
+
+---
+
+## Configuration & Environment Variables
+
+Configure Latch via environment variables in your shell or `.env.local`:
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `LATCH_PORT` | `3001` | Local coordination API daemon port |
+| `LATCH_UI_PORT` | `3002` | Mission Control web dashboard port |
+| `LATCH_UI_ORIGIN` | `http://localhost:3002` | Allowed CORS origin for dashboard requests |
+| `GITHUB_CLIENT_ID` | *Optional* | GitHub OAuth app ID for device-flow authentication |
+| `GITHUB_CLIENT_SECRET` | *Optional* | GitHub OAuth secret for hosted login gates |
+| `DEBUG` | `false` | Enable verbose debug logging for AST graph parsing |
+
+---
+
+## Troubleshooting & Diagnostics
+
+### Run the Diagnostic Suite
+If something looks out of sync, run `latch doctor` on the affected machine:
+```bash
+latch doctor
+```
+It tests:
+1. Local daemon liveness on `127.0.0.1:3001`.
+2. Room configuration and role integrity (`host` vs. `guest`).
+3. Reachability of the host through the ngrok tunnel.
+4. Active lock mirroring and hook file presence.
+
+### Common Issues and Resolutions
+
+#### 1. `offline — run latch serve`
+- **Cause**: No daemon process is responding on port `3001`.
+- **Fix**: Run `latch serve` in a terminal window, or check if another process is occupying port `3001` using `lsof -i :3001`.
+
+#### 2. The Board is Empty but Agent Locking Works
+- **Cause**: Hooks call the daemon API directly over HTTP, whereas the dashboard is updated by the lock mirror.
+- **Fix**: Restart `latch serve` on your machine to refresh the SSE stream.
+
+#### 3. Agent Edits Without Claiming Locks
+- **Cause**: The workspace was cloned using raw `git clone` instead of `latch clone`, so hooks were not written.
+- **Fix**: Run `latch add .` inside the repository root to install hooks for all agents.
+
+#### 4. `cannot reach the host` (Guests)
+- **Cause**: The host machine closed their laptop, restarted the daemon, or the ngrok tunnel URL refreshed.
+- **Fix**: Have the host copy the updated invite link from Mission Control (**Team → Share**) and re-join with `latch pull`.
+
+---
+
+## Frequently Asked Questions (FAQ)
+
+#### Does Latch replace Git?
+**No.** Git coordinates human commits over hours and days. Latch coordinates autonomous AI agents editing the same files **right now in real time**. You still branch, commit, review pull requests, and merge as normal.
+
+#### What happens if an agent crashes while holding a lock?
+Locks use time-to-live leases (default 30 seconds). If an agent crashes, exits, or is terminated, its heartbeat stops and Latch **auto-releases the lock**, preventing stale deadlocks.
+
+#### Does Latch upload my code or prompts to a cloud server?
+**No.** Latch is completely self-hosted on your machine. All file parsing, AST generation, and lock tables live in memory on your host laptop. If you share a room across machines, patches stream directly peer-to-peer over an encrypted tunnel.
+
+#### Can I use Latch with solo development?
+**Yes.** Even for a single developer, running Claude Code in the terminal while editing in Cursor IDE frequently results in race conditions. Latch coordinates your local terminal agents and IDE agents seamlessly.
+
+---
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for details.
