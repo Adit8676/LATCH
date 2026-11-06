@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="./latch-logo.png" alt="Latch Logo" width="280" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./latch-logo-white.png">
+    <source media="(prefers-color-scheme: light)" srcset="./latch-logo.png">
+    <img src="./latch-logo-white.png" alt="Latch Logo" width="280" />
+  </picture>
 </p>
 
 <p align="center">

@@ -23,7 +23,8 @@
     "!mission-control/node_modules",
     "README.md",
     "LICENSE",
-    "latch-logo.png"
+    "latch-logo.png",
+    "latch-logo-white.png"
   ],
   "repository": {
     "type": "git",
