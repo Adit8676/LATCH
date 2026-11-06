@@ -1,40 +1,17 @@
-# Latch (`latch.it`)
+<p align="center">
+  <img src="./latch-logo.png" alt="Latch Logo" width="280" />
+</p>
 
-> **The coordination layer for machine-speed coders.**  
-> Prevent concurrent agent clobbers, bound AST blast radiuses, and synchronize distributed AI coding swarms in real time.
+<p align="center">
+  <strong>The coordination layer for machine-speed coders.</strong><br />
+  Prevent concurrent agent clobbers, bound AST blast radiuses, and synchronize distributed AI coding swarms in real time.
+</p>
 
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [The Problem: Why Autonomous Agent Swarms Break](#the-problem-why-autonomous-agent-swarms-break)
-- [How Latch Works](#how-latch-works)
-  - [1. Sub-Millisecond Exclusive File Mutex Leases](#1-sub-millisecond-exclusive-file-mutex-leases)
-  - [2. AST Dependency Blast-Radius Bounding](#2-ast-dependency-blast-radius-bounding)
-  - [3. Non-Invasive Stop Hook Interception](#3-non-invasive-stop-hook-interception)
-  - [4. Host–Guest Room Topology](#4-hostguest-room-topology)
-  - [5. Causal Working-Tree Patch Sync](#5-causal-working-tree-patch-sync)
-  - [6. Shared Memory & MCP Context Engine](#6-shared-memory--mcp-context-engine)
-- [Installation](#installation)
-  - [System Requirements](#system-requirements)
-  - [Installing the CLI](#installing-the-cli)
-- [Quickstart: Getting Started in 3 Minutes](#quickstart-getting-started-in-3-minutes)
-  - [Mode A: Room Host (Starting a Swarm)](#mode-a-room-host-starting-a-swarm)
-  - [Mode B: Teammate / Guest (Joining a Swarm)](#mode-b-teammate--guest-joining-a-swarm)
-  - [Testing Your First Coordinated Write](#testing-your-first-coordinated-write)
-- [Supported Agents & Hook Protocol](#supported-agents--hook-protocol)
-- [CLI Reference](#cli-reference)
-  - [Identity Commands](#identity-commands)
-  - [Workspace Management](#workspace-management)
-  - [Daemon & Server](#daemon--server)
-  - [Causal Patch Sync](#causal-patch-sync)
-  - [Diagnostics & MCP](#diagnostics--mcp)
-- [Using Mission Control Dashboard](#using-mission-control-dashboard)
-- [Using the MCP Context Server](#using-the-mcp-context-server)
-- [Configuration & Environment Variables](#configuration--environment-variables)
-- [Troubleshooting & Diagnostics](#troubleshooting--diagnostics)
-- [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
+<p align="center">
+  <img src="https://img.shields.io/badge/version-2.4-emerald?style=flat-square" alt="Version 2.4" />
+  <img src="https://img.shields.io/badge/agents-Claude%20%7C%20Cursor%20%7C%20Antigravity%20%7C%20Copilot-blue?style=flat-square" alt="Supported Agents" />
+  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License MIT" />
+</p>
 
 ---
 
